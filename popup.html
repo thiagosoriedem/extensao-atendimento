@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciador de Mensagens PRO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --success-hover: #15803d;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --warning: #ea580c;
+      --warning-hover: #c2410c;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      width: 420px;
+      margin: 0;
+      padding: 16px;
+      background-color: var(--background);
+      color: var(--text);
+    }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .header h2 { margin: 0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .header h2 span { color: var(--primary); }
+    
+    .btn-fixar { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 5px; display: flex; align-items: center; }
+    .btn-fixar:hover { background-color: var(--border); color: var(--primary); }
+
+    .card { background: var(--surface); border-radius: 12px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 12px; }
+    .form-linha { display: flex; gap: 8px; margin-bottom: 10px; }
+    .form-grupo { flex: 1; }
+    
+    label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 4px; }
+    input, textarea, select { width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 13px; background-color: var(--background); }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); background-color: var(--surface); }
+    textarea { height: 65px; resize: none; margin-bottom: 10px; }
+
+    .botoes-container { display: flex; gap: 8px; }
+    .btn-principal { flex: 1; padding: 9px; background-color: var(--success); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-principal:hover { background-color: var(--success-hover); }
+    .btn-principal.modo-edicao { background-color: var(--warning); }
+    .btn-principal.modo-edicao:hover { background-color: var(--warning-hover); }
+    .btn-cancelar { padding: 9px; background-color: var(--text-secondary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none; }
+
+    /* Seção de Pastas com lista interna de gerenciamento */
+    .pasta-input-container { display: flex; gap: 6px; margin-bottom: 8px; }
+    .btn-add-pasta { background-color: var(--primary); color: white; border: none; border-radius: 8px; padding: 0 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-add-pasta:hover { background-color: var(--primary-hover); }
+    .btn-add-pasta.modo-edicao { background-color: var(--warning); }
+    
+    .lista-pastas-gerenciador { max-height: 90px; overflow-y: auto; padding-right: 4px; border-top: 1px solid var(--border); padding-top: 6px; margin-top: 6px; }
+    .lista-pastas-gerenciador::-webkit-scrollbar { width: 4px; }
+    .lista-pastas-gerenciador::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    
+    .item-pasta-gerencia { display: flex; justify-content: space-between; align-items: center; background: var(--background); padding: 4px 8px; border-radius: 6px; margin-bottom: 4px; font-size: 12px; }
+    .item-pasta-nome { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%; }
+
+    .busca-container { position: relative; margin-bottom: 12px; }
+    .busca-container input { padding-left: 34px; background-color: var(--surface); }
+    .busca-container .icon-busca { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 18px; }
+
+    .secao-titulo { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    
+    .lista-mensagens { max-height: 180px; overflow-y: auto; padding-right: 4px; margin-bottom: 12px; position: relative; }
+    .lista-mensagens::-webkit-scrollbar { width: 5px; }
+    .lista-mensagens::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+    .item-mensagem { background: var(--surface); padding: 10px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; position: relative; user-select: none; }
+    .item-mensagem:active { cursor: grabbing; }
+    .item-mensagem.arrastando { opacity: 0.4; background-color: var(--background); border-style: dashed; }
+    .item-mensagem.drag-over { border-top: 3px solid var(--primary); background-color: #eff6ff; }
+
+    .item-info { display: flex; flex-direction: column; max-width: 65%; pointer-events: none; }
+    .item-titulo { font-weight: 600; font-size: 12px; color: var(--text); }
+    .item-meta { display: flex; gap: 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+    .item-tag-cat { color: var(--primary); }
+    .item-tag-atalho { color: var(--warning); }
+    .item-preview { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    
+    .acoes-item { display: flex; gap: 2px; }
+    .btn-acao { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 5px; border-radius: 6px; display: flex; align-items: center; }
+    .btn-acao.editar:hover { background-color: #ffedd5; color: var(--warning); }
+    .btn-acao.deletar:hover { background-color: #fee2e2; color: var(--danger); }
+
+    .item-mensagem .tooltip-previa { visibility: hidden; width: 280px; background-color: #1e293b; color: #f8fafc; text-align: left; border-radius: 8px; padding: 10px; position: absolute; z-index: 999; top: 110%; left: 15px; bottom: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 11px; line-height: 1.4; white-space: pre-wrap; opacity: 0; transition: opacity 0.2s, visibility 0.2s; pointer-events: none; border: 1px solid #475569; }
+    .item-mensagem .tooltip-previa::after { content: ""; position: absolute; bottom: 100%; left: 20px; top: auto; border-width: 5px; border-style: solid; border-color: transparent transparent #1e293b transparent; }
+    body:not(.arrastando-ativo) .item-mensagem:hover .tooltip-previa { visibility: visible; opacity: 1; }
+
+    .backup-container { display: flex; gap: 6px; background: var(--surface); padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
+    .btn-backup { flex: 1; padding: 6px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .btn-backup:hover { background-color: var(--border); color: var(--primary); }
+    #inputImportar { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2><span class="material-icons-round">bolt</span><span>TextSync Ultra</span></h2>
+    <button id="btnFixar" class="btn-fixar" title="Fixar janela na tela">
+      <span class="material-icons-round">open_in_new</span>
+    </button>
+  </div>
+
+  <div class="card">
+    <label id="tituloSeçãoPasta">📂 Gerenciar Pastas / Subpastas</label>
+    <div class="pasta-input-container">
+      <input type="text" id="novaPastaNome" placeholder="Ex: Consultas > Unidades">
+      <button id="btnCriarPasta" class="btn-add-pasta" title="Adicionar Pasta">
+        <span id="iconePastaBtn" class="material-icons-round">create_new_folder</span>
+      </button>
+      <button id="btnCancelarEdicaoPasta" class="btn-acao" style="display:none; background-color:var(--text-secondary); color:white; border-radius:8px;" title="Cancelar edição">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div id="listaPastasGerenciador" class="lista-pastas-gerenciador"></div>
+  </div>
+
+  <div class="card">
+    <div class="form-linha">
+      <div class="form-grupo">
+        <label for="titulo">Título do Menu</label>
+        <input type="text" id="titulo" placeholder="Ex: Preparo BERA">
+      </div>
+      <div class="form-grupo" style="flex: 0 0 110px;">
+        <label for="atalho">Atalho (--)</label>
+        <input type="text" id="atalho" placeholder="Ex: bera">
+      </div>
+    </div>
+
+    <div class="form-linha">
+      <div class="form-grupo">
+        <label for="categoria">Designar para a Pasta</label>
+        <select id="categoria"></select>
+      </div>
+    </div>
+    
+    <label for="texto">Texto de Envio</label>
+    <textarea id="texto" placeholder="Utilize {nome}, {cpf}, {exame}, {convenio}, {medico}, {unidade}, {valor}, {data} e {hora} se necessário..."></textarea>
+    
+    <div class="botoes-container">
+      <button id="btnCancelar" class="btn-cancelar">Cancelar</button>
+      <button id="btnSalvar" class="btn-principal">
+        <span id="iconeBotao" class="material-icons-round">add_circle_outline</span> 
+        <span id="textoBotao">Salvar Mensagem</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="busca-container">
+    <span class="material-icons-round icon-busca">search</span>
+    <input type="text" id="campoBusca" placeholder="Pesquisar por título, texto ou atalho...">
+  </div>
+
+  <div class="secao-titulo">Sua Biblioteca (Arraste para reordenar)</div>
+  <div id="listaMensagens" class="lista-mensagens"></div>
+
+  <div class="backup-container">
+    <button id="btnCarregarPadrao" class="btn-backup" style="background-color: #eff6ff; border-color: #bfdbfe; color: var(--primary);" title="Carrega o arquivo backup_padrao.json da raiz">
+      <span class="material-icons-round" style="font-size:16px;">autorenew</span> Restaurar Padrão
+    </button>
+    <button id="btnExportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_download</span> Exportar</button>
+    <label for="inputImportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_upload</span> Importar</label>
+    <input type="file" id="inputImportar" accept=".json">
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

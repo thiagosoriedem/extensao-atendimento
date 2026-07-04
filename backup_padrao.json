@@ -1,0 +1,686 @@
+{
+  "mensagens": [
+    {
+      "atalho": "0",
+      "categoria": "Outros",
+      "id": "msg_1782138191555_0_424",
+      "texto": "Olá, {nome}! Tudo bem? Seja bem-vindo(a) à *SOS Otorrino João Pessoa*! Meu nome é Thiago Medeiros, e serei responsável pelo seu atendimento. Me conte, como posso te ajudar hoje?",
+      "titulo": "Apresentação Padrão (Thiago Medeiros)"
+    },
+    {
+      "atalho": "1",
+      "categoria": "Consultas",
+      "id": "msg_1782138191555_1_39",
+      "texto": "O valor da consulta no pronto atendimento por ordem de chegada custa R$ 310,00 em espécie/PIX ou R$ 330,00 em até 5x no cartão para as unidades de Tambaú, Manaíra, Torre e Bessa. Tem direito a 30 dias de retorno e lavagens de ouvido inclusas (mediante avaliação). Não é necessário agendamento prévio.",
+      "titulo": "Consultas: Valor Global PA (Tambaú, Manaíra, Torre, Bessa)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Unidades",
+      "id": "msg_1782138191555_2_430",
+      "texto": "Na unidade de Mangabeira, o valor da consulta de pronto atendimento custa R$ 180,00, aceitando apenas espécie ou PIX. O atendimento é por ordem de chegada, de segunda a sexta, das 08h às 12h, das 14h às 18h e das 18h30 às 20h30. \n\n-*Atenção:* Recomendamos chegar antes das 11h30, 17h30 e 20h30 devido ao fluxo de fichas.\n-*Endereço:* Centro Médico Dra. Maria Leni Medeiros - R. Lino Alves de Oliveira, 18 - Mangabeira III, João Pessoa - PB, 58056-630",
+      "titulo": "Consultas: Unidade Mangabeira"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Unidades",
+      "id": "msg_1782138191555_3_326",
+      "texto": "Na unidade de Campina Grande, o valor da consulta é R$ 300,00 (Particular) parcelado em até 5x no cartão. O atendimento é de segunda a sexta, das 08h às 20h, e aos sábados, das 08h às 18h.",
+      "titulo": "Consultas: Unidade Campina Grande"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas",
+      "id": "msg_1782138191555_4_239",
+      "texto": "As unidades abertas em finais de semana e feriados são Tambaú (24 horas por dia, de domingo a domingo), Manaíra (das 08h às 18h) e Bessa (das 08h às 12h e das 14h às 18h). O atendimento para queixas comuns é por ordem de chegada e a consulta custa R$ 310,00 no PIX/espécie ou R$ 330,00 em até 5x no cartão.",
+      "titulo": "Consultas: Finais de Semana e Feriados"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas",
+      "id": "msg_1782138191555_5_375",
+      "texto": "A lavagem de ouvido precede de uma avaliação médica na consulta para verificar o estado do conduto auditivo (se não há inflamação, se a cera está propícia para remoção no ato, etc.). O valor do pronto atendimento é R$ 310,00 (PIX/espécie) ou R$ 330,00 (cartão até 5x), com direito a 30 dias de retorno e o procedimento incluso se indicado pelo médico.",
+      "titulo": "Consultas: Lavagem de Ouvido (Orientação)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas",
+      "id": "msg_1782138191555_6_611",
+      "texto": "Para realizar apenas o procedimento de lavagem no ouvido, é obrigatório possuir um laudo/encaminhamento recente de um médico otorrinolaringologista explicitando a necessidade. Não aceitamos laudos de outras especialidades. Mediante a apresentação, pode ser repassado o valor exclusivo do procedimento.",
+      "titulo": "Consultas: Pedido exclusivo de Lavagem (Médico Externo)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Geral",
+      "id": "msg_1782138191555_7_983",
+      "texto": "Para agendamento de consulta domiciliar, necessitamos do envio de: documento de identidade, CPF e comprovante de residência do paciente. O pagamento é feito de forma antecipada via PIX ou link de cartão (em até 5x). O valor é de R$ 650,00 no PIX e R$ 720,00 (em até 5x) no cartão. Após a confirmação, alinhamos o dia e horário com a médica responsável.",
+      "titulo": "Consultas: Domiciliar (Fluxo e Cadastro)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191555_8_82",
+      "texto": "Para atendimentos da Unimed João Pessoa dos tipos 'Sob Medida' ou 'Viver Mais', é obrigatório apresentar a guia de encaminhamento emitida pelo Centro Médico Zona Sul ou pelo Hospital da Unimed, contendo o código de consulta pacote 60908075. Não temos cobertura para Unimed Rio, Manaus, Norte/Nordeste e Vertente do Caparaó.",
+      "titulo": "Restrições Unimed: Cartões Sob Medida / Viver Mais"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191555_9_528",
+      "texto": "Atendemos o convênio Prevmed em todas as nossas clínicas da SOS Otorrino para consultas (apresentando identidade e carteirinha). Ressaltamos que a Prevmed cobre exclusivamente a consulta médica; caso o profissional solicite exames complementares, o convênio garante uma tabela de donuts/descontos especial para a realização destes de forma particular.",
+      "titulo": "Restrições Convênio: Atendimento Prevmed"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782138191555_10_361",
+      "texto": "A audiometria completa particular (Tonal + Vocal + Impedanciometria) custa R$ 240,00 em espécie/PIX ou R$ 260,00 em até 4x no cartão. \n\nRealizamos por ordem de chegada, não precisa agendar, na nossa unidade de *Tambaú24h*, de *segunda à sábado das 08h30-12h / 14h30-18h* ou na unidade de *Manaíra* de *segunda à quarta das 09h-11h30 / 14h-17h* e nas *quintas* à tarde das *14h às 17h*. O resultado o fonoaudiólogo entrega na hora. Realizamos as audiometrias a partir dos 5 anos de idade do paciente!\n\n*Tambaú24h - Endereço:* R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB, 58039-111\n\n*Manaíra - Endereço:* R. Manoel Bezerra Cavalcanti, 47 - Manaíra, João Pessoa - PB, 58038-500.",
+      "titulo": "Exames: Audiometria Completa (Tonal + Vocal + Impedâncio)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782138191555_11_349",
+      "texto": "A audiometria tonal isolada custa R$ 60,00 em espécie/PIX ou R$ 65,00 no cartão para o vencimento. Realizada por ordem de chegada para pacientes a partir de 5 anos que compreendem comandos. É necessário trazer o edital do concurso ou a requisição médica do exame.",
+      "titulo": "Exames: Audiometria Tonal Isolada"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782138191555_12_99",
+      "texto": "A videolaringoscopia particular custa R$ 310,00 em espécie/PIX ou R$ 330,00 em até 5x no cartão. É realizada por ordem de chegada em Manaíra (Seg a Sex: 08h-12h / 14h-17h) e inclui laudo do exame e gravação (trazer pen-drive). Caso o edital do concurso exija laudo descritivo com RQE do Otorrino, este deve ser emitido em consulta médica conjunta, cujo valor é de R$ 310,00 (espécie/PIX) ou R$ 330,00 (cartão).",
+      "titulo": "Exames: Videolaringoscopia (Concurso e RQE)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782138191555_13_676",
+      "texto": "A Vídeo-Endoscopia Naso-Sinusal com ótica flexível particular custa R$ 310,00 em espécie/PIX ou R$ 330,00 em até 5x no cartão. Realizamos na unidade de Tambaú 24h e Manaíra, de segunda a sexta-feira, das 08h às 17h, por ordem de chegada.",
+      "titulo": "Exames: Vídeo-Endoscopia Naso-Sinusal"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782138191555_14_72",
+      "texto": "A tomografia computadorizada da face é realizada de segunda a sexta, das 08h30 às 11h30 e das 13h30 às 17h, por ordem de chegada. Atendemos pelos convênios CASSI, GEAP, UNIMED e SAÚDE CAIXA. No particular, o valor é R$ 250,00 em espécie, PIX ou cartão em até 3x.",
+      "titulo": "Exames: Tomografia da Face / Seios da Face"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782138191555_15_727",
+      "texto": "O Teste Vestibular (Vectoeletronistagmografia) particular custa R$ 245,00 no PIX/espécie ou R$ 260,00 no cartão (até 4x). Realizado por agendamento em Tambaú. \n\nO resultado é entregue na hora.\n\n⚠️ RESTRIÇÕES OBRIGATÓRIAS:\n• 3 DIAS ANTES: Suspender remédios para labirintite, calmantes e antidepressivos.\n• 6 HORAS ANTES: Não consumir cafeína (café, chá, chocolate, refrigerante).\n• NO DIA: Jejum leve de 2h. Comparecer sem maquiagem, protetor solar, cremes ou lentes de contato.",
+      "titulo": "Exames: Teste Vestibular / VECTO (Preparo)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Cristian/Ana",
+      "id": "msg_1782138191556_16_304",
+      "texto": "A Acufenometria é realizada exclusivamente de forma particular com o fonoaudiólogo Cristian, nas sextas-feiras às 13h30 em Tambaú (por agendamento). O exame serve para analisar o grau e tipo do zumbido. REQUISITOS: O paciente deve estar apresentando o zumbido no dia do exame e ter um exame de audiometria realizado recentemente.",
+      "titulo": "Exames: Acufenometria (Pesquisa de Zumbido)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Geral",
+      "id": "msg_1782138191556_17_247",
+      "texto": "O exame do PAC é indicado para pacientes a partir de 7 anos. Realizado nas quintas-feiras pela manhã em Manaíra (Fono Amanda Camara) ou sextas (Danielly Francisco). Valor: R$ 550,00 no PIX/espécie ou R$ 610,00 no cartão (até 5x). REQUISITOS: Apresentar audiometria completa com no máximo 1 semana (pode ser feita na hora por R$ 165,00 à vista). Pacientes em uso de medicação para atenção/foco DEVEM realizar o exame sob o efeito do remédio.",
+      "titulo": "Exames: Processamento Auditivo Central (PAC)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_18_705",
+      "texto": "O BERA para bebês de 0 a 6 meses é realizado com agendamento na unidade Tambaú às 08:00h da manhã. O exame só é realizado com a criança em sono profundo natural.\n⚠️ ORIENTAÇÕES:\n• NÃO deixe o bebê dormir no percurso ou antes da autorização do fonoaudiólogo.\n• Acorde a criança mais cedo no dia e deixe para amamentar/alimentar na clínica.\n• Traga objetos de conforto ('naninhas'). Atrasos superiores a 15 min geram remarcação.",
+      "titulo": "Exames: BERA Bebê sem Sedação (0 a 6 meses)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_19_46",
+      "texto": "O BERA sem sedação para adultos/pesquisa de limiar é realizado por ordem de chegada com a fonoaudióloga Fouvy Leccia, de segunda a sexta, das 14h30 às 17h na unidade Tambaú. Caso possua exames de audiometria anteriores, traga-os. O tempo total de agendamento é de 1 hora.",
+      "titulo": "Exames: BERA Adulto / Pesquisa de Limiar"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_20_895",
+      "texto": "A Eletrococleografia é realizada nas quartas e sextas pela manhã em Tambaú por agendamento. É indolor e não invasiva. \n⚠️ IMPORTANTE: Exige limpeza TOTAL prévia do conduto auditivo com o otorrinolaringologista da clínica antes do exame (impurezas inviabilizam o resultado). Pedimos para chegar 30 minutos antes, vir sem brincos e sem maquiagem.",
+      "titulo": "Exames: ECOHCG (Eletrococleografia)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_21_183",
+      "texto": "O exame P300 particular custa R$ 365,00 em espécie/PIX ou R$ 388,28 em até 5x no cartão. Realizado por agendamento a partir dos 7 anos (quartas e sextas pela manhã em Tambaú). REQUISITO OBRIGATÓRIO: Apresentar audiometria tonal recente (máximo 4 meses), que pode ser feita na hora (R$ 60,00 à vista). O paciente deve vir descansado (não pode estar sonolento) e cooperar com os comandos.",
+      "titulo": "Exames: POTENCIAL EVOCADO - P300"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_22_613",
+      "texto": "O exame VEMP é realizado apenas de forma particular por R$ 220,00 no PIX/espécie ou R$ 245,00 no cartão (até 4x). Agendado com a fonoaudióloga Fouvy. RESTRIÇÕES: Não tomar relaxante muscular nas últimas 24h. O exame não pode ser realizado se o paciente estiver gripado ou se apresentar alteração no exame de imitanciometria.",
+      "titulo": "Exames: VEMP (Potencial Evocado Miogênico)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Polissonografia",
+      "id": "msg_1782138191556_23_316",
+      "texto": "A Polissonografia Domiciliar (Tipo 3) particular custa R$ 610,00 à vista ou R$ 650,00 no cartão (até 5x). O paciente comparece a Manaíra ou Tambaú à tarde (entre 15h e 16h30) para receber o dispositivo e orientações da enfermagem. Leva o aparelho, dorme com ele em casa e DEVE realizar a devolução impreterivelmente no dia seguinte até as 10h da manhã. O laudo fica pronto de 10 a 15 dias úteis.",
+      "titulo": "Exames: Polissonografia Domiciliar (Instruções)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Polissonografia",
+      "id": "msg_1782138191556_24_528",
+      "texto": "A Polissonografia com teste de CPAP (TUSS 40103544) é indicada para pacientes que já realizam a polissonografia convencional. É realizada na unidade Manaíra com a fonoaudióloga Raquel Francy (Seg, Qua e Sex a partir das 18h15). O paciente deve trazer o resultado do exame de noite inteira anterior. Não há cobertura para o convênio Saúde Caixa.",
+      "titulo": "Exames: Polissonografia com CPAP Domiciliar"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Geral",
+      "id": "msg_1782138191556_25_475",
+      "texto": "Realizado por Dr. Álvaro (quartas em Manaíra - R$ 380,00 à vista / R$ 420,00 cartão). \n\n🍲 DIETA OBRIGATÓRIA (Trazer no dia):\n• 1 suco de manga ou pêssego (Del Valle) abaixo de 1L\n• 1 papinha de frutas industrializada ou 1 banana madura inteira com casca\n• 3 unidades de biscoito água e sal (Cream Cracker)\n• 1 anilina/corante comestível líquido na cor AZUL MARINHO ou PRETA. Não é necessário jejum absoluto.",
+      "titulo": "Exames: Vídeo-Deglutição (Dr. Álvaro)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_26_292",
+      "texto": "O exame de Estroboscopia é realizado pelo Dr. Álvaro Pontes nas quartas-feiras à tarde na unidade de Manaíra (voltado para avaliação de voz cantada, lesões em cordas vocais, etc.), ou com a Dra. Weidinara Rodrigues. Agendamento prévio particular direto com a secretaria no valor de R$ 600,00 (em até 5x).",
+      "titulo": "Exames: Estroboscopia Laringea"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_27_942",
+      "texto": "O Teste Alérgico Completo (Prick Test - 32 antígenos) é realizado em Manaíra pela Dra. Socorro Marques para adultos e crianças a partir de 5 anos. Custa R$ 335,00 (Apenas em Espécie/PIX). \n⚠️ CUIDADOS: Suspender rigorosamente todo e qualquer antialérgico, xarope, antigripal, ranitidina ou cimetidina nos 3 dias anteriores ao teste. Não requer jejum. O resultado sai em 20 minutos.",
+      "titulo": "Testes Alérgicos: Prick Test Completo (Dra. Socorro)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Geral",
+      "id": "msg_1782138191556_28_464",
+      "texto": "Realizado exclusivamente de forma particular pela Dra. Natália Cavalcanti (Otorrino Pediatra) por R$ 250,00 em espécie/PIX. Engloba baterias de ácaros, fungos, pólen, pelos de animais, barata, mosquito, látex e alimentos (cacau, trigo, leite, ovo, camarão). CUIDADO: Não estar tomando antialérgicos nos 5 dias anteriores.",
+      "titulo": "Testes Alérgicos: Prick Test (Dra. Natália Cavalcanti)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Geral",
+      "id": "msg_1782138191556_29_550",
+      "texto": "Realizado de segunda a sexta, das 09h às 17h, pela equipe de enfermagem na unidade Tambaú. Teste de puntura básico para poeira, fungos, animais e alguns alimentos. Valor: R$ 90,00 em espécie/PIX ou R$ 99,90 no cartão para o vencimento. Verificar disponibilidade com a enfermagem de plantão.",
+      "titulo": "Testes Alérgicos: Simples em Pronto Atendimento (Tambaú)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_30_679",
+      "texto": "A SOS Otorrino, seguindo as determinações da Lei Geral de Proteção de Dados - LGPD (Lei nº 13.709/18), precisa que o Sr(a) confirme a autorização de envio. Por gentileza, responda digitando este texto preenchido:\nEu, __________________________________, portador do CPF __________________, autorizo que a SOS OTORRINO me encaminhe via WhatsApp o resultado do meu exame, nota fiscal e/ou laudo médico. Acuso o recebimento.",
+      "titulo": "LGPD: Autorização de Envio de Exames (Adulto)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_31_879",
+      "texto": "A SOS Otorrino, seguindo as determinações da Lei Geral de Proteção de Dados - LGPD (Lei nº 13.709/18), precisa da autorização do responsável legal. Por gentileza, responda preenchendo os dados abaixo:\nEu, __________________________________, responsável legal do menor __________________________________, portador do CPF __________________, autorizo que a SOS OTORRINO me encaminhe via WhatsApp o resultado do exame, nota fiscal e/ou laudo do paciente. Acuso o recebimento.",
+      "titulo": "LGPD: Autorização de Envio de Exames (Menor de Idade)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_32_902",
+      "texto": "Para solicitar o prontuário médico, envie para wellison.cunha@sosotorrino.com.br os seguintes documentos: 1. Carta escrita a próprio punho (manuscrita) assinada contendo Nome, RG, CPF, motivo do pedido, período do atendimento e unidade. 2. Cópia do documento oficial com foto. \n⚠️ ATENÇÃO: Caso o envio seja por e-mail, os documentos devem vir assinados digitalmente via GOV.BR ou Certificado Digital. O prazo de entrega é de até 7 dias úteis. Se preferir, a entrega da carta manuscrita pode ser feita presencialmente na recepção de Tambaú em horário comercial.",
+      "titulo": "Administrativo: Solicitação de Prontuário Médico"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_33_383",
+      "texto": "Conforme as regras fiscais, a Nota Fiscal de prestação de serviços médicos é emitida obrigatoriamente no nome do paciente que recebeu o atendimento clínico, independente de quem realizou o pagamento financeiro. Para fins de declaração de Imposto de Renda (IR), orientamos que o responsável financeiro inclua o paciente como seu dependente legal na declaração e anexe esta nota fiscal aos dados dele.",
+      "titulo": "Administrativo: Justificativa de Nome na Nota Fiscal"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_34_27",
+      "texto": "Houve uma atualização contratual no sistema da Unimed João Pessoa. Agora, ao visualizar o aplicativo, o código de pacote (60908075) detalha todos os exames preventivos e de consultório inclusos na sua consulta. Fique tranquilo: você não está sendo cobrado por vários procedimentos e nem haverá acréscimo na sua coparticipação. Trata-se apenas dos exames padrão aos quais você já tem direito sem custos adicionais dentro da própria consulta.",
+      "titulo": "Administrativo: Esclarecimento sobre Pacote Unimed JP"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_35_149",
+      "texto": "Os valores de procedimentos cirúrgicos dependem exclusivamente de uma avaliação em consulta médica, pois envolvem custos variáveis como taxas do bloco cirúrgico hospitalar, honorários do anestesista, equipe médica auxiliar e materiais específicos. Valores informados em consultas prévias servem como estimativa média do profissional e englobam os retornos pós-operatórios básicos.",
+      "titulo": "Cirurgias: Orçamento e Valores Base"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_36_76",
+      "texto": "Temos atendimento com o Dr. André Albuquerque, especialista em Cabeça e Pescoço, na unidade Manaíra. Ele atende de forma particular (R$ 450,00 no PIX/espécie) e pela Unimed JP. Para atendimentos via GEAP ou CASSI, o agendamento não é feito por nossa telefonia direta: você deve entrar em contato com a central do seu convênio e solicitar a marcação através da Cooperativa dos Cirurgiões de Cabeça e Pescoço para a nossa estrutura.",
+      "titulo": "Especialistas: Encaminhamento para Dr. André Albuquerque (Cabeça e Pescoço)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_37_85",
+      "texto": "📞 Central e Contatos SOS Otorrino:\n• Tambaú 24h: (83) 3247-6465 | WhatsApp: (83) 99136-6246\n• Manaíra: (83) 3022-8383 | WhatsApp: (83) 99661-9779\n• Bessa: (83) 3022-8384 | WhatsApp: (83) 99947-2978\n• Torre: (83) 3507-0428 | WhatsApp: (83) 99116-6450\n• Valentina: (83) 3022-8381 | WhatsApp: (83) 99413-2574\n• Mangabeira: (83) 3508-4799 | WhatsApp: (83) 99632-3059\n• Campina Grande: (83) 3065-4551 | WhatsApp: (83) 99178-2206",
+      "titulo": "Contatos: Telefones Oficiais das Unidades"
+    },
+    {
+      "atalho": "",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_38_707",
+      "texto": "Percebemos que você pode estar ocupado(a) no momento, e entendemos perfeitamente! Estamos finalizando este atendimento por aqui para não incomodar. Fique totalmente à vontade para nos contatar novamente quando for mais conveniente; estaremos prontos para te ajudar em novas dúvidas, com novas datas e marcações. A SOS Otorrino agradece a preferência! Tenha um excelente dia.",
+      "titulo": "Fechamento de Atendimento (Paciente Ocupado)"
+    },
+    {
+      "atalho": "f",
+      "categoria": "Outros",
+      "id": "msg_1782138191556_39_584",
+      "texto": "Eu que agradeço pela preferência e sinta-se à vontade para entrar em contato sempre que precisar. A SOS Otorrino agradece o seu contato!",
+      "titulo": "Fechamento de Atendimento"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_40_716",
+      "texto": "Realizamos o teste da orelhinha por ordem de chegada, sem necessidade de agendamento, a partir dos 15 dias de vida do recém-nascido (RN). O exame é realizado de segunda-feira a sexta-feira, por ordem de chegada, sem necessidade de agendamento, no período da tarde, das 13h30 às 17h, em nossa unidade de Tambaú.\n\n**Endereço:** R. Nossa Sra. dos Navegantes, 446 - Tambaú, João Pessoa - PB, 58039-111.\n\n- É importante trazer a documentação/certidão do RN, a guia de solicitação do exame e a carteira do convênio, caso seja por convênio.\n- O resultado é entregue em até 3 dias úteis.\n- Recomendamos que, antes de sair de casa, entre em contato pelo telefone (83) 3247-6465 para confirmar se a fonoaudióloga já iniciou os atendimentos.",
+      "titulo": "Teste da orelhinha"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_41_628",
+      "texto": "Particular o exame custa 190R$ em espécie/pix ou 200,00R$ ATÉ 3X no cartão de débito ou crédito.",
+      "titulo": "Teste da orelhinha: Valor"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_42_865",
+      "texto": "Realizamos o teste da orelhinha e da línguinha por ordem de chegada, sem necessidade de agendamento, a partir dos 15 dias de vida do recém-nascido (RN). O exame é realizado de segunda-feira a sexta-feira, por ordem de chegada, sem necessidade de agendamento, no período da tarde, das 13h30 às 17h, em nossa unidade de Tambaú.\n\nEndereço: R. Nossa Sra. dos Navegantes, 446 - Tambaú, João Pessoa - PB, 58039-111.\n\n- É importante trazer a documentação/certidão do RN, a guia de solicitação do exame e a carteira do convênio, caso seja por convênio.\n- O resultado é entregue em até 3 dias úteis.\n- Recomendamos que, antes de sair de casa, entre em contato pelo telefone (83) 3247-6465 para confirmar se a fonoaudióloga já iniciou os atendimentos.",
+      "titulo": "Exames: Teste da orelhinha e línguinha"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Dermatologista",
+      "id": "msg_1782146667470",
+      "texto": "O valor da consulta para dermatologista, está custando R$ 560 em espécie/pix, R$ 580 em até 1x no cartão ou R$ 600,00 em até 3x no cartão.",
+      "titulo": "Valor Dermatologistas Particular"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Dermatologista",
+      "id": "msg_1782138191556_43_129",
+      "texto": "Para agendamentos e dúvidas sobre Dra. Veruska, recomendamos a entrar em contato com a secretária dela no whatsapp 99193-8888 - ANA CRISTINA. \n- Onde os agendamentos estão sendo realizados através da mesma.\n- Dra. Veruska atende nas terças e quintas pela manhã em Manaíra por hora marcada.",
+      "titulo": "Consulta: Dermatologista - Veruska"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782138191556_44_81",
+      "texto": "O teste da línguinha, realizamos apenas pela Hapvida ou no particular, onde custa 90,00R$ em espécie/pix ou 95,00R$ À VISTA no cartão.",
+      "titulo": "Teste da línguinha: Valor"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Oftalmologista",
+      "id": "msg_1782138191556_45_568",
+      "texto": "Para oftalmo, nós possuímos Dra. Teresa Gambarra, oftalmologista, que atende conosco na unidade de TambaúDia, nas terças e sextas por agendamento. \n\nNo momento, a Dra. só está realizando consultas pela Unimed ou no particular, ao qual custa R$ 310 em espécie/pix - R$ 330 EM 5X no cartão. Caso deseje realizar o agendamento e tirar dúvidas com a secretária, pode entrar em contato no Whatsapp 83 99186-3883.\n\n*Endereço:* R. Nossa Sra. dos Navegantes, 446 - Tambaú, João Pessoa - PB, 58039-111",
+      "titulo": "Consulta Dra. Teresa Gambarra"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Tomografia",
+      "id": "msg_1782138191556_46_840",
+      "texto": "A tomografia da face realizamos de segunda à sexta das 08h30 às 11h30 e das 13h30 às 17h por ordem de chegda sem precisar de agendamento prévio. \n\nRealizamos pelos convênios da CASSI, GEAP, UNIMED e SAÚDE CAIXA, ou no particular 250 R$ em espécie, pix ou cartão em até 3x.\n\n*Endereço:* R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB, 58039-111.",
+      "titulo": "Tomografia da face"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782138191556_47_418",
+      "texto": "Dra. Christiane Birck atende por ordem de chegada sem precisar agendar, nas segundas de 08h às 12h em Manaíra, nas quartas de 14h às 17h em Mangabeira e nas quintas de 08h30 às 12h em Tambaú.",
+      "titulo": "Dra. Christiane Birck"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Confirmação",
+      "id": "msg_1782138191556_48_61",
+      "texto": "Está realizado o agendamento da consulta para Dr(a). {medico} às {hora} na unidade de {unidade}.",
+      "titulo": "Consulta agendada"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Confirmação",
+      "id": "msg_1782138191556_49_493",
+      "texto": "Confirmado! Seu exame de {exame} está agendado com o(a) {medico} na unidade {unidade} para o dia {data} às {hora}. Pelo convênio {convenio} o valor fica {valor}. Lembramos que o nome impresso na guia deve ser {nome}.",
+      "titulo": "TESTE"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Orientações",
+      "id": "msg_1782240283947",
+      "texto": "RECOMENDAÇÕES E ORIENTAÇÕES:\n    \n    - Caso o paciente possua exames audiológicos/audiométricos, realizados anteriormente, pede-se para que eles sejam apresentados no momento do atendimento.\n    1. O exame/ Preparo:\n    Exame indolor e não invasivo.\n    Para a realização do exame são utilizados eletrodos de superfície, que são posicionados na testa e nos lobos da orelha do paciente. Fones, específicos, de ouvido também são utilizados na avaliação.\n    \n    Durante a avaliação não pode haver movimentações do paciente (paciente deve estar relaxado).\n    Pede-se para não usar brincos e evitar maquiagens.\n    \n    1. Ao chegar na clínica:\n    Atendimento é por HORA MARCADA.\n    Chegue com, o mínimo de, 30 minutos de antecedência.\n    Lembre-se de trazer a guia de solicitação do exame e documentação do paciente.\n    _ Tempo total de agendamento - 1hora (Esse tempo NÃO será ultrapassado).\n    _ Caso haja necessidade, outro dia será escolhido, num intervalo de 30 dias, para conclusão do exame\n    _ Atrasos superiores a 15 minutos serão considerado desistência e o exame será remarcado.",
+      "titulo": "BERA – PESQ. DE LIMIAR / BERA – FREQUÊNCIA ESPECÍFICA / MÉDIA LATÊNCIA /SEM SEDAÇÃO – ADULTO / ESTADO ESTÁVEL"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Orientações",
+      "id": "msg_1782138191556_50_672",
+      "texto": "- BERA BEBÊ SEM SEDAÇÃO (0 A 6 MESES):\n    1. Ao chegar na clínica:\n    Atendimento é por HORA MARCADA.\n    Chegue com, o mínimo, de 30 minutos de antecedência.\n    Lembre-se de trazer a guia do exame e documentação do paciente.\n    Apenas colocar o bebê para dormir após chegar na clínica e tiver autorização do fonoaudiólogo.\n    NÃO trazer ou deixar o bebê dormir no percurso até a clínica.\n    O exame só é realizado com a criança dormindo.\n    _ Tempo total de agendamento - 1hora (8:00 as 9:00). Esse tempo não será ultrapassado.\n    _ Caso haja necessidade, outro dia será escolhido, num intervalo de 30 dias, para conclusão do exame (apenas será realizado 1 (UM)\n    retorno).\n    _ Atrasos superiores a 15 minutos serão considerados desistência e o exame será remarcado.\n    \n    Sugestões:\n    Acorde a criança mais cedo que o usual e não a deixe cochilar e/ou dormir até a hora do exame.\n    Traga um objeto de conforto (“naninhas”).\n    Deixe para amamentar/alimentar a criança na clínica.",
+      "titulo": "BERA BEBÊ SEM SEDAÇÃO (0 A 6 MESES)"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Orientações",
+      "id": "msg_1782138191556_51_429",
+      "texto": "ELETROCOCLEOGRAFIA (Ecochg):\n\nInformações importantes – Leia com atenção:\n\n1. O exame/ Preparo:\nExame indolor e não invasivo.\nDurante a avaliação não pode haver movimentações do paciente (paciente deve estar relaxado).\nPede-se para não usar brincos e evitar maquiagens.\n\nPara a realização do exame são utilizados eletrodos de superfície, que são posicionados na testa e nos lobos da orelha do paciente, e um eletrodo que é inserido no conduto auditivo. Fones, específicos, de ouvido também são utilizados na avaliação.\n\n*IMPORTANTE:* Para a realização da Eletrococleografia se faz necessário a limpeza TOTAL do conduto auditivo, para eliminação completa de impurezas (essas impurezas comprometem os achados e impossibilitam a realização do exame.\n\n1. Ao chegar na clínica:\nAtendimento é por HORA MARCADA.\nChegue com, no mínimo, 30 minutos de antecedência.\nLembre-se de trazer a guia do exame e documentação do paciente.\nEsse tempo é necessário para passagem pela recepção e pelo médico otorrinolaringologista para a limpeza total do conduto auditivo.\n\n*ATENÇÃO:* Caso o paciente não cumpra o pré-requisito da limpeza do conduto auditivo até a hora marcada para o exame, o exame será *REMARCADO*.\n\n1. Resultados:\nQuatro (4) dias úteis após a realização do exame.\nEntregues na unidade TAMBAU.",
+      "titulo": "ELETROCOCLEOGRAFIA (Ecochg):"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas > Unidades > Mensagens",
+      "id": "msg_1782138191556_52_1",
+      "texto": "Na unidade de Tambaú, o atendimento é 24h por dia de domingo a domingo. \n\n*Endereço:* R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB, 58039-111.",
+      "titulo": "Tambaú24h"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Orientações",
+      "id": "msg_1782138191556_53_152",
+      "texto": "Recomendações do exame do Processamento Auditivo Central (PAC): \n\n- É necessário realizar a autorização da guia do exame com no mínimo 20 a 30 dias de antecedência do exame.\n- Se faz necessário apresentar o resultado de audiometria no dia do exame. Caso não tenha realizado, realizar uma audiometria completa recente(audiometria tonal, vocal e impedânciometria), com 1 semana no máximo. Caso não consiga realizar com 1 semana, pode ser realizado no mesmo dia do agendamento do exame, sem problemas, na mesma unidade de Manaíra.\n- Pacientes que fazem o uso de medicação (principalmente para queixas de atenção) tem que vir fazer o PAC tomando o remédio.\n- Prazo da entrega do exame: até 1(uma) semana.",
+      "titulo": "PAC"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Valores > Prevmed(Desconto)",
+      "id": "msg_1782138191556_54_439",
+      "texto": "TESTE VESTIBULAR/VECTO ELETRONISTRAGMOGRAFIA pela Prevmed custa R$ 107,74 em ATÉ 2X.",
+      "titulo": "VECTO"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Valores > Prevmed(Desconto)",
+      "id": "msg_1782138191556_55_912",
+      "texto": "(AUDIOMETRIA TONAL +AUDIOMETRIA VOCAL + IMPEDANCIOMETRIA ) pela Prevmed custa R$ 107,74 em ATÉ 2X.",
+      "titulo": "A+4"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Valores > Prevmed(Desconto)",
+      "id": "msg_1782138191556_56_108",
+      "texto": "NASOFIBROLARINGOSCOPIA pela Prevmed custa R$ 96,97 Para o vencimento no cartão.",
+      "titulo": "NASOFIBROLARINGOSCOPIA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782138191556_57_35",
+      "texto": "Dra. Natalia Cristina Amaral atende por ordem de chegada, sem precisar de agendamento prévio, nas segundas-feiras pela manhã 08h às 12h na unidade da Torre. \n\nTerças-feiras pela manhã na unidade de Tambaú24h de 08h às 12h. \n\nQuartas-feiras pela manhã das 08h às 12h na unidade de Tambaú24h. \n\nQuintas-feiras pela manhã na unidade da Torre de 08h às 12h. \n\nSextas das 14h às 18h em Manaíra.\n\n*Observação:* Recomendamos sempre a entrar em contato por ligação na central de atendimentos (83) 3247-6465, para verificar se ocorreu alguma troca de plantão ou imprevistos.",
+      "titulo": "Dra. Natalia Cristina Amaral"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782138191556_58_365",
+      "texto": "UNIDADE CAMPINA GRANDE – End. R. Delmiro Gouvêia, 442, Centenário | Centro Médico do Hospital Antônio Targino | 5º andar\n\nContato:  (83) 3065-4551\nWhatsApp : (83) 99178-2206\n\nHorário de funcionamento é de Segunda à Sexta das 08h às 20h. E nos Sábados das 08 às 18h.",
+      "titulo": "UNIDADE CAMPINA GRANDE"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Tomografia",
+      "id": "msg_1782138191556_59_721",
+      "texto": "O exame de tomografia da face, pode ser solicitado via whatsapp da Dia Diagnóstico 3576-4730, empresa terceirizada que realiza o exame da unidade de Tambaú.",
+      "titulo": "Solicitação de Exames"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Polissonografia",
+      "id": "msg_1782138191556_60_328",
+      "texto": "Olá, {nome}! Tudo bem? Estamos entrando em contato, referente ao exame da polissonografia, que o sr. realizou conosco. A enfermagem ao analisar os gráficos do exame, foi identificado pouco fluxo de oxigenação do cateter nasal, onde foi orientado a realizar um reteste do exame.\n\nTeremos vaga para ------ das 15h às 17h para estar vindo na unidade de Tambaú para pegar o aparelho e realizar o reteste. O sr. desejaria?\n\nAgradecemos a compreensão. Ficaremos no aguardo de um retorno!\n\nDesejo uma excelente tarde!",
+      "titulo": "Mensagem reteste"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Confirmação",
+      "id": "msg_1782138191556_61_945",
+      "texto": "Agradecemos a confirmação da consulta. Estamos à disposição para qualquer necessidade. A SOS Otorrino agradece pelo seu contato!",
+      "titulo": "Agradecimento de Conf. de consulta"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782236154884",
+      "texto": "Nossas consultas para otorrino são por ordem de chegada no pronto atendimento sem precisar de agendamento prévio.\n\nNa unidade de Tambaú, o atendimento é 24h por dia de domingo a domingo. \n\n*Endereço: R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB, 58039-111.*",
+      "titulo": "TAMBAÚ24H"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782155829585",
+      "texto": "A Dra. Rebeca atende nos seguintes horários e locais: segundas-feiras à tarde, das 13h às 17h, e terças-feiras pela manhã, das 09h30 às 12h, em Manaíra; quartas-feiras pela manhã, das 08h às 12h, na unidade do Bessa, e à tarde, das 13h às 17h, na unidade de Tambaú; quintas-feiras à tarde, das 13h às 17h, em Manaíra; e sextas-feiras pela manhã, das 08h às 12h, no Bessa.",
+      "titulo": "Dra. Rebeca Maurera"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782236220779",
+      "texto": "Nossas consultas para otorrino são por ordem de chegada no pronto atendimento sem precisar de agendamento prévio.\n\nNa unidade de Manaíra, o atendimento é de segunda à quinta das 08h às 22h, nas sextas de 08h às 20h e nos finais de semanas de 08h às 18h. \n\n*Endereço: R. Manoel Bezerra Cavalcanti, 47 - Manaíra, João Pessoa - PB, 58038-500.*",
+      "titulo": "MANAÍRA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782236353648",
+      "texto": "Nossas consultas para otorrino são por ordem de chegada no pronto atendimento sem precisar de agendamento prévio.\n\nNa unidade de Mangabeira, o atendimento é de segunda à sexta das 08h às 12h e das 14h às 18h e das 18h30 às 20h30 . \n\n*Atenção:* Enfatizamos que, devido ao fluxo de atendimento da unidade e as fichas, recomendamos chegar antes das 11h30, 17h30 e 20h30.\n\n*Endereço: Centro Médico Dra. Maria Leni Medeiros - R. Lino Alves de Oliveira, 18 - Mangabeira III, João Pessoa - PB, 58056-630*",
+      "titulo": "MANGABEIRA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782236386535",
+      "texto": "Nossas consultas para otorrino são por ordem de chegada no pronto atendimento sem precisar de agendamento prévio.\n\nNa unidade da Torre, o atendimento é de segunda à sexta das 08h às 12h e das 13h30 às 17h30. \n\n*Endereço: Empresarial Medical Center - Av. Rui Barbosa, 228 - Torre, João Pessoa - PB, 58040-490*",
+      "titulo": "TORRE"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782236441671",
+      "texto": "Nossas consultas para otorrino são por ordem de chegada no pronto atendimento sem precisar de agendamento prévio.\n\nNa unidade do Bessa, o atendimento é de segunda à sexta das 08h às 12h e das 14h às 20h e nos finais de semanas e feriados, de 08h às 12h e das 14h às 17h30. \n\n*Endereço: Av. Gov. Argemiro de Figueiredo, 4581 - Jardim Oceania, João Pessoa - PB, 58037-030*",
+      "titulo": "BESSA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Unidades",
+      "id": "msg_1782155813315",
+      "texto": "Neste feriado de São João, estaremos funcionando apenas em Tambaú, que é 24h por dia, Manaíra e Bessa das 08h às 18h.",
+      "titulo": "Especial São João"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782237597036",
+      "texto": "Dr. Josemar Soares atende nas segundas e quartas das 8h30 às 12h e das 14h às 18h30 em Tambaú, por ordem de chegada sem precisar de agendamento prévio.",
+      "titulo": "Dr. Josemar Soares"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782238671060",
+      "texto": "Dra. Kallyne Cavalcante, atende por ordem de chegada sem precisar de agendamento prévio na unidade de Manaíra nas terças-feiras de 08h às 15h e Quartas-feiras de 09h às 12h. Nas quintas-feiras pela manhã, das 08h às 12h na unidade de Tambaú24h e à tarde na unidade da Torre, das 13h30 às 17h.",
+      "titulo": "Dra. Kallyne Cavalcante"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782238783106",
+      "texto": "Dr. Bruno Leonardo atende por ordem de chegada sem precisar de agendamento prévio nas segundas-feiras das 19h às 21h30 na unidade de Manaíra. Nas terças-feiras pela manhã das 08h Às 12h na unidade da Torre. Nas quartas-feiras pela manhã em Mangabeira das 08h Às 12h e à tarde das 14h às 17h30 na unidade da Torre. Nas quintas-feiras pela manhã das 09h Às 12h30 na unidade de Tambaú. E nas sextas-feiras manhã e tarde na unidade da Torre das 08h às 12h e das 14h às 17h30.",
+      "titulo": "Dr. Bruno Leonardo"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782238867330",
+      "texto": "Dr. Ravi Rodrigues atende por ordem de chegada sem precisar de agendamento prévio nas segundas à tarde de 14h às 18h em Mangabeira e à noite das 19h Às 22h em Tambaú.  Na terça-feira das 14h às 19h no Bessa. Quintas-feiras das 17h às 22h em Manaíra. E sextas-feiras à tarde 13h às 19h em Tambaú.",
+      "titulo": "Dr. Ravi Rodrigues"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas",
+      "id": "msg_1782239579134",
+      "texto": "O valor da consulta por agendamento, custa R$ 360,00 em espécie/pix ou R$ 370,00 em até 5X no cartão.",
+      "titulo": "Valor consulta hora marcada"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Orientações",
+      "id": "msg_1782240413873",
+      "texto": "RECOMENDAÇÕES E ORIENTAÇÕES:\n    \n    Leia com atenção.\n    \n    *ATENÇÃO:* é *OBRIGATÓRIA* apresentação de avaliação de audiometria tonal (realizada com o máximo de 4 meses) para a avaliação.\n    \n    - O exame de audiometria (tonal) pode ser realizado no mesmo dia do agendamento do P300.\n    Para isto, orienta-se que o paciente chegue com antecedência, para solicitação, autorização e realização da audiometria.\n    1. O exame/ Preparo:\n    Exame é indolor e não invasivo.\n    Para a realização do exame são utilizados eletrodos de superfície (adesivos), que são posicionados na testa, nos lobos das orelhas, e em um ponto especifico na cabeça do paciente. Fones, específicos, de ouvido também são utilizados na avaliação.\n    Durante a avaliação não pode haver movimentações do paciente.\n    Pede-se para não usar brincos e evitar maquiagens.\n    _ Recomenda-se NÃO estar sonolento.\n    Paciente precisa estar desperto e atento durante a avaliação (haverá necessidade de execução de comandos específicos, orientados pelo fonoaudiólogo, durante a avaliação).\n    Caso o paciente adormeça, o exame será cancelado e UM retorno será remarcado para nova data no período de 30 dias.\n    2. Ao chegar na clínica:\n    Atendimento é por HORA MARCADA.\n    Chegue com, o mínimo de, 30 minutos de antecedência.\n    Lembre-se de trazer a guia de solicitação do exame, autorizada, e documentação do paciente.\n    _ Atraso superior a 10 minutos será considerado desistência e o exame será remarcado.",
+      "titulo": "MMN/P300"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Orientações",
+      "id": "msg_1782240560173",
+      "texto": "ORIENTAÇÕES E RECOMENDAÇÕES:\n\nAs restrições do VEMP, são situações que geram cancelamento e remarcação do exame.\n\n    Paciente estar gripado.\n    Paciente realizou audiometria e impedanciomentria, e está com o exame de imitanciometria alterado.",
+      "titulo": "VEMP"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Solicitações",
+      "id": "msg_1782240755747",
+      "texto": "Para solicitar o prontuário médico, o(a) Sr(a). deve seguir as orientações abaixo:\n\n*1.* Documentos Necessários\n\nVocê deverá apresentar ou enviar:\n\n- *Solicitação por escrito (obrigatoriamente manuscrita / redigida a próprio punho)* contendo todas as informações listadas no item 2 abaixo.\n- *Cópia de documento oficial com foto* (RG, CNH ou equivalente)\n- *Formulário de Ciência* preenchido e assinado (formulário interno da clínica, que confirma que você está ciente do prazo de entrega)\n\n*2.* Conteúdo obrigatório da solicitação escrita (carta manuscrita)\n\nA carta deve conter, de forma clara e legível:\n\n- Nome completo\n- RG\n- CPF\n- Motivo da solicitação\n- Período do atendimento (mês e ano)\n- Unidade onde foi atendido\n- Tipo de atendimento (Plano de Saúde ou Particular)\n- Local e data\n- Assinatura\n\n*3.* Prazos:\n\n- Após o recebimento e conferência da documentação completa, a solicitação é encaminhada ao médico responsável.\n- *Prazo de entrega do prontuário: até 7 dias úteis.*\n\n*4.* Como realizar a solicitação\n\nVocê tem duas opções:\n\n*a) Presencial*\n\n- Compareça à recepção da unidade Tambaú com a carta manuscrita solicitando o prontuário.\n- Horário: comercial, até às 17h\n\n*b) Digital (por e-mail)*\n\n- Enviar para: wellison.cunha@sosotorrino.com.br\n- *Exigência obrigatória*: a solicitação escrita (carta manuscrita) e o Formulário de Ciência devem estar assinados digitalmente com:\n    - Certificado Digital *ou*\n    - Assinatura eletrônica válida pelo portal *gov.br*\n    - *Sem assinatura digital válida o pedido não será aceito/processado.*\n\nQualquer dúvida, procure a recepção ou o e-mail informado.\nÉ necessário enviar toda a documentação completa para que o processo seja iniciado.",
+      "titulo": "SOLICITAÇÃO DE PRONTUÁRIO"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Confirmação",
+      "id": "msg_1782401635485",
+      "texto": "Está agendado o exame de VECTO-ELETRONISTAGMOGRAFIA para *quarta-feira 8/7 às 16h30* na unidade de Tambaú - Endereço: R. Nossa Sra. dos Navegantes, 446 - Tambaú, João Pessoa - PB, 58039-111. Recomendamos que chegue com 15min de antecedência na unidade para realizar todo o processo de atendimento, caso contrário, será necessário a remarcação do exame. É importante seguir as seguintes restrições e recomendações para realizar o exame, abaixo:\n\n• TRÊS DIAS ANTES DO EXAME:\nSUSPENDER MEDICAÇÃO PARA LABIRINTITE, CALMANTES E ANTIDEPRESSIVOS.\n• NO DIA DO EXAME:\nNÃO USAR MAQUIAGEM, NENHUM TIPO DE HIDRATANTE NO ROSTO, LENTES DE CONTATO E PROTETOR SOLAR. FAZER UM LANCHE LEVE DUAS HORAS ANTES DO EXAME. NÃO FUMAR.\n• SEIS HORAS ANTES DO EXAME:\nNÃO CONSUMIR CAFÉ, CHÁ, CHOCOLATE, REFRIGERANTE, NADA QUE CONTENHA CAFEÍNA.",
+      "titulo": "VECTO-ELETRONISTAGMOGRAFIA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1782735393637",
+      "texto": "O BERA com pesquisa de limiar, no particular custa 555R$ em espécie/pix ou 590,00R$ ATÉ 5X no cartão. Onde realizamos por agendamento na sexta-feira 3/7 às 11h em Tambaú.",
+      "titulo": "BERA C/ PESQ. DE LIMIAR"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Valores",
+      "id": "msg_1782834035601",
+      "texto": "Considerando que a frenectomia seja realizada em consultório, no particular custa R$ 435 em espécie/pix ou R$ 460,00 ATÉ 5X no cartão.",
+      "titulo": "VALOR: FRENECTOMIA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Solicitações",
+      "id": "msg_1782836460167",
+      "texto": "A consulta de avaliação é fundamental para que o cirurgião conheça o paciente, entenda o caso, avalie as condições clínicas e decida o local mais adequado para a realização do procedimento, seja em consultório ou em bloco cirúrgico. Essa etapa é essencial para garantir a segurança e o sucesso da cirurgia.",
+      "titulo": "CONSULTA DE AVALIAÇÃO"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Confirmação",
+      "id": "msg_1782836946994",
+      "texto": "Está realizado o agendamento para *{data} às {hora}* em Tambaú com Dr. Josemar Soares. \n*Endereço: R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB, 58039-111.*",
+      "titulo": "Consulta Agenda Dr. Josemar Soares"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas",
+      "id": "msg_1782837978204",
+      "texto": "Para consultas de gastro, temos a nossa empresa parceira, chamada Gastroprocto, onde para dúvidas e agendamentos, pode estar entrando em contato pelo telefone 3142-1416 ou pelo WhatsApp 99133-2154 para agendar.",
+      "titulo": "GASTROPROCTO"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1782918858124",
+      "texto": "Dr. Gilvandro Abrantes, atende por ordem de chegada sem precisar agendar, nas quintas das 13h às 18h e das 19h às 22h em Tambaú.\n*Endereço: R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB, 58039-111.*",
+      "titulo": "Dr. Gilvandro Abrantes"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1782928871411",
+      "texto": "Realizamos a audiometria tonal, vocal e impedânciometria em MANGABEIRA, onde custa R$ 150 em espécie/pix. \nÉ realizado na:\n- TERÇA e QUINTA: 08:30 ÀS 11:30\n- SEGUNDA e QUARTA: 14:00 ÀS 16:00",
+      "titulo": "Audiometria Mangabeira"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Convênios",
+      "id": "msg_1783002898916",
+      "texto": "Atendemos prontamente pela Funasa, com exceção da Funasa Promosaúde, para a qual não somos credenciados para realizar atendimento.",
+      "titulo": "Funasa Atendimento Consulta"
+    },
+    {
+      "atalho": "",
+      "categoria": "Mensagens > Convênios",
+      "id": "msg_1783004048473",
+      "texto": "Atendemos pela Cassi, basta trazer documento de identidade e carteira do convênio. As consultas com otorrino são por ordem de chegada no pronto atendimento, sem necessidade de agendamento. \n\nNa unidade de Tambaú, o atendimento é 24 horas, todos os dias, no endereço R. Nossa Sra. dos Navegantes, 500 - Tambaú, João Pessoa - PB. \n\nNa unidade de Manaíra, o atendimento é de segunda a quinta, das 08h às 22h; sexta, das 08h às 20h; e finais de semana, das 08h às 18h, na R. Manoel Bezerra Cavalcanti, 47 - Manaíra, João Pessoa - PB.",
+      "titulo": "Cassi Atendimento Consulta"
+    },
+    {
+      "atalho": "",
+      "categoria": "Médicos",
+      "id": "msg_1783004278062",
+      "texto": "Para agendamentos e dúvidas sobre Dr. Álvaro, recomendamos a entrar em contato com a secretária dele, Ana Cristina, pelo WhatsApp 99193-8888.",
+      "titulo": "Dr. Álvaro Pontes"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Cristian/Ana",
+      "id": "msg_1783005119022",
+      "texto": "Sr(a). {nome}, o fonoaudiólogo informou que só consegue realizar o exame de testes vestibulares completo, se realmente suspender todas as medicações, e realizar o exame sem efeitos medicamentosos. Onde, por exemplo, não impede que seja realizado o exame se não conseguir suspender, mas ela abordará o exame de uma outra forma, realizando o exame sem a prova calórica.\n\n- A prova calórica é o principal teste da avaliação labiríntica. A prova calórica é um exame que testa o labirinto (órgão do equilíbrio interno no ouvido). O médico coloca ar levemente quente e frio nos ouvidos. E a mudança de temperatura provoca uma sensação rápida de tontura e um movimento involuntário dos olhos, permitindo avaliar se o equilíbrio está funcionando bem.\n\n- Caso não consiga suspender, não tem problema, pode continuar tomando normalmente, mas no dia do exame, se faz necessário informar que não conseguiu suspender essas medicações diretamente para o profissional, e ele realizará o exame sem a prova calórica.",
+      "titulo": "Prova Calórica"
+    },
+    {
+      "atalho": "",
+      "categoria": "Consultas",
+      "id": "msg_1783005547712",
+      "texto": "*VALORES DAS CONSULTAS POR UNIDADE*\n\nConfira abaixo os valores e formas de pagamento de cada unidade:\n\n🟢 *Tambaú | Manaíra | Torre | Bessa*\n💳 Valor: R$ 330,00 no débito ou cartão (parcelamos em até 5x)\n💵 Valor: R$ 310,00 no pagamento em espécie ou PIX\n👂 Lavagem no ouvido inclusa, caso seja necessário\n\n🟢 *Mangabeira*\n💵 Valor: R$ 180,00 (pagamento somente em espécie ou PIX)\n👂 Lavagem no ouvido: acréscimo de R$ 30,00, caso seja necessário\n\n🟢 *Campina Grande (Hospital Antônio Targino)*\n💳 Valor: R$ 300,00 (parcelamos em até 5x no cartão)\n👂 Lavagem no ouvido inclusa, caso seja necessário\n\n🗓️ *Consultas com agendamento prévio*\n💵 Valor: R$ 360,00 no pagamento em espécie ou PIX\n💳 Valor: R$ 370,00 no débito ou crédito (parcelamos em até 5x)\n⚠️ Necessário verificar a disponibilidade na agenda.\n\n⚠️ Os dias e horários de atendimento variam conforme cada unidade.\n\nEm caso de dúvidas, estamos à disposição!",
+      "titulo": "VALORES DAS CONSULTAS POR UNIDADE"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames",
+      "id": "msg_1783015962298",
+      "texto": "Olá, {nome}! Tudo bem? Seja bem-vindo(a) à *SOS Otorrino João Pessoa*! Meu nome é Thiago Medeiros e serei responsável pelo seu atendimento. \nA NASOFIBROLARINGOSCOPIA particular custa R$ 310,00 em espécie/PIX ou R$ 330,00 em até 5x no cartão. É realizada por ordem de chegada, sem precisar de agendamento prévio, em Manaíra (Seg a Sex: 08h-12h / 14h-17h) e inclui laudo do exame e gravação.  \n- *Endereço:* R. Manoel Bezerra Cavalcanti, 47 - Manaíra, João Pessoa - PB, 58038-500.",
+      "titulo": "NASOFIBROLARINGOSCOPIA"
+    },
+    {
+      "atalho": "",
+      "categoria": "Exames > Fouvy",
+      "id": "msg_1783022375273",
+      "texto": "Pela Digna a OTOEMISSÕES EVOCADAS (TESTE DA ORELINHA) no particular custa R$ 136,00 em espécie/pix ou R$ 152,00 ATÉ 3X no cartão para João Pessoa. \nE o  TESTE DE LIGUINHA plea Digna no particular custa R$ 64,00 em espécie/pix ou R$ 72,00 Para o vencimento no cartão em João Pessoa.",
+      "titulo": "Digna: Teste da orelhinha e línguinha"
+    }
+  ],
+  "pastas": [
+    "Administrativo > Geral",
+    "Consultas",
+    "Consultas > Dermatologista",
+    "Consultas > Geral",
+    "Consultas > Oftalmologista",
+    "Consultas > Unidades",
+    "Consultas > Unidades > Mensagens",
+    "Exames",
+    "Exames > Cristian/Ana",
+    "Exames > Fouvy",
+    "Exames > Geral",
+    "Exames > Polissonografia",
+    "Exames > Tomografia",
+    "Exames > Valores",
+    "Exames > Valores > Prevmed(Desconto)",
+    "Mensagens > Confirmação",
+    "Mensagens > Convênios",
+    "Mensagens > Orientações",
+    "Mensagens > Solicitações",
+    "Mensagens > Unidades",
+    "Médicos",
+    "Outros"
+  ]
+}
