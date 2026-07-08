@@ -390,6 +390,53 @@ function fecharMenuCliqueFora(e) {
   }
 }
 
+/**
+ * Converte uma string Base64 para um objeto File.
+ * @param {string} base64 - A string de dados em Base64 (ex: "data:image/png;base64,iVBORw...").
+ * @param {string} nomeArquivo - O nome que o arquivo terá.
+ * @returns {File | null} O objeto File ou null se a conversão falhar.
+ */
+function base64ParaArquivo(base64, nomeArquivo) {
+  try {
+    let arr = base64.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], nomeArquivo, { type: mime });
+  } catch (e) {
+    console.error("Erro ao converter Base64 para Arquivo:", e);
+    return null;
+  }
+}
+
+/**
+ * Escreve os arquivos na área de transferência do navegador.
+ * @param {Array} arquivos - Um array de objetos File para serem enviados.
+ * @returns {Promise<boolean>} Retorna true se bem-sucedido, false caso contrário.
+ */
+async function enviarAnexos(arquivos) {
+  if (!arquivos || arquivos.length === 0) return false;
+  if (!navigator.clipboard || !navigator.clipboard.write) {
+    console.error("TextSync PRO: A API de Clipboard (navigator.clipboard.write) não é suportada neste navegador ou contexto.");
+    alert("Seu navegador não suporta o envio de anexos por esta extensão. Tente atualizar o Chrome.");
+    return false;
+  }
+
+  try {
+    const clipboardItems = arquivos.map(file => new ClipboardItem({ [file.type]: file }));
+    await navigator.clipboard.write(clipboardItems);
+    return true;
+  } catch (error) {
+    console.error("TextSync PRO: Erro ao escrever arquivos na área de transferência:", error);
+    alert("Ocorreu um erro ao tentar anexar os arquivos. Verifique as permissões do navegador.");
+    return false;
+  }
+}
+
 function inserirMensagemSelecionada(msg, termoParaRemover) {
   if (!campoAtivo) return;
 
@@ -425,21 +472,51 @@ function inserirMensagemSelecionada(msg, termoParaRemover) {
     }
   }
 
-  if (campoAtivo.value !== undefined) {
-    let valorCompleto = campoAtivo.value;
-    
-    if (termoParaRemover && valorCompleto.includes(termoParaRemover)) {
-      const posicaoGatilho = valorCompleto.lastIndexOf(termoParaRemover);
-      valorCompleto = valorCompleto.substring(0, posicaoGatilho) + valorCompleto.substring(posicaoGatilho + termoParaRemover.length);
+  // LÓGICA DE ENVIO DE ANEXOS
+  if (msg.anexos && msg.anexos.length > 0) {
+    (async () => {
+      const arquivosParaEnviar = msg.anexos.map(anexo => base64ParaArquivo(anexo.dados, anexo.nome)).filter(Boolean);
+      
+      if (arquivosParaEnviar.length > 0) {
+        const sucesso = await enviarAnexos(arquivosParaEnviar);
+        if (sucesso) {
+          // Garante que o campo de texto principal tenha o foco antes de colar.
+          campoAtivo.focus();
+          // Simula o comando 'colar' do usuário para que o WhatsApp abra a tela de anexo.
+          document.execCommand('paste');
+        }
+      }
+      // Continua para colar o texto como legenda após um breve atraso.
+      colarTextoComoLegenda(textoFinal, termoParaRemover);
+    })();
+  } else {
+    // Se não houver anexos, cola o texto imediatamente.
+    colarTextoComoLegenda(textoFinal, termoParaRemover, 0);
+  }
+}
+
+function colarTextoComoLegenda(textoFinal, termoParaRemover, atraso = 150) {
+  setTimeout(() => {
+    // Re-seleciona o campo ativo, que pode ter mudado para o campo de legenda do anexo.
+    const campoAtual = document.activeElement;
+    const campoFinal = (campoAtual && (campoAtual.value !== undefined || campoAtual.isContentEditable)) ? campoAtual : campoAtivo;
+
+    if (campoFinal.value !== undefined) {
+      let valorCompleto = campoFinal.value;
+      
+      if (termoParaRemover && valorCompleto.includes(termoParaRemover)) {
+        const posicaoGatilho = valorCompleto.lastIndexOf(termoParaRemover);
+        valorCompleto = valorCompleto.substring(0, posicaoGatilho) + valorCompleto.substring(posicaoGatilho + termoParaRemover.length);
+      }
+
+      campoFinal.value = valorCompleto + textoFinal;
+      
+      // Dispara eventos para que o React do WhatsApp reconheça a mudança
+      campoFinal.dispatchEvent(new Event('input', { bubbles: true }));
+      campoFinal.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    const start = campoAtivo.selectionStart || 0;
-    campoAtivo.value = valorCompleto + textoFinal;
-    
-    campoAtivo.dispatchEvent(new Event('input', { bubbles: true }));
-    campoAtivo.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-
-  removerMenu();
-  campoAtivo.focus();
+    removerMenu();
+    campoFinal.focus();
+  }, atraso);
 }

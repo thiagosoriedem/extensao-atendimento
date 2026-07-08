@@ -22,16 +22,219 @@ const tituloSeçãoPasta = document.getElementById('tituloSeçãoPasta');
 const btnExportar = document.getElementById('btnExportar');
 const inputImportar = document.getElementById('inputImportar');
 
+// Elementos de anexos
+const btnAnexar = document.getElementById('btnAnexar');
+const inputAnexo = document.getElementById('inputAnexo');
+const listaAnexos = document.getElementById('listaAnexos');
+
+// Elementos da Agenda
+const telaPrincipal = document.getElementById('tela-principal');
+const telaAgenda = document.getElementById('tela-agenda');
+const btnAbrirAgenda = document.getElementById('btnAbrirAgenda');
+const btnVoltarAgenda = document.getElementById('btnVoltarAgenda');
+const btnSalvarAgenda = document.getElementById('btnSalvarAgenda');
+const btnAdicionarMedicoAgenda = document.getElementById('btnAdicionarMedicoAgenda');
+const containerGerenciadorAgenda = document.getElementById('container-gerenciador-agenda');
+
+
 let idMensagemEmEdicao = null;
 let pastaEmEdicaoNome = null; // Controla se estamos renomeando uma pasta
 let todasAsMensagens = [];
 let itemArrastado = null;
+let anexosTemporarios = []; // Array para armazenar anexos antes de salvar
 
 const PASTAS_PADRAO = ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"];
+const UNIDADES_DISPONIVEIS = [
+    "SOS OTORRINO ALTIPLANO",
+    "SOS OTORRINO BESSA",
+    "SOS OTORRINO CAMPINA GRANDE",
+    "SOS OTORRINO MANAIRA",
+    "SOS OTORRINO MANGABEIRA",
+    "SOS OTORRINO TAMBAU 24 HRS",
+    "SOS OTORRINO TAMBAÚ DIA",
+    "SOS OTORRINO TELEMEDICINA",
+    "SOS OTORRINO TORRE",
+    "SOS OTORRINO VALENTINA",
+    "CAMPINA GRANDE - DESIGN MALL"
+].sort();
+const DADOS_INICIAIS_AGENDA = {
+    '3926': { nome: "Adilson De Albuquerque Viana Junior", horarios: [] },
+    '3787': { nome: "Adriano Sergio Freire Meira", horarios: [] },
+    '10652': { nome: "Alaíse clementino guedes", horarios: [] },
+    '3927': { nome: "Alexandre Augusto de Brito Pereira Guimaraes", horarios: [] },
+    '3928': { nome: "Alvaro Vitorino de Pontes Junior", horarios: [] },
+    '4201': { nome: "AMANDA CAMARA MIRANDA", horarios: [] },
+    '4507': { nome: "Ana Carolina do Valle Dornelas", horarios: [] },
+    '4202': { nome: "Ana Isaura Dias Pessoa", horarios: [] },
+    '3960': { nome: "ANDRE ALBUQUERQUE SILVEIRA", horarios: [] },
+    '3942': { nome: "ANDRÉ PINTO VILLARIM", horarios: [] },
+    '5673': { nome: "Andreza Rodrigues Santos Martins", horarios: [] },
+    '11994': { nome: "Beatriz da Silva Araújo", horarios: [] },
+    '3929': { nome: "Bruno Leonardo Barbosa Machado", horarios: [
+        { dia: 1, inicio: 19, fim: 21.5, unidade: "SOS OTORRINO MANAIRA" },
+        { dia: 2, inicio: 8, fim: 12, unidade: "SOS OTORRINO TORRE" },
+        { dia: 5, inicio: 8, fim: 17.5, unidade: "SOS OTORRINO TORRE" }
+    ]},
+    '3930': { nome: "Christiane Kulzer Birck", horarios: [
+        { dia: 1, inicio: 8, fim: 12, unidade: "SOS OTORRINO MANAIRA" },
+        { dia: 3, inicio: 14, fim: 17, unidade: "SOS OTORRINO MANGABEIRA" },
+        { dia: 4, inicio: 8.5, fim: 12, unidade: "SOS OTORRINO TAMBAÚ DIA" }
+    ]},
+    '4205': { nome: "Cristian Luan Macena", horarios: [] },
+    '11558': { nome: "Danielly Francisco de Figueiredo", horarios: [] },
+    '3962': { nome: "Fábia Lívia Ramos Brilhante de França", horarios: [] },
+    '4209': { nome: "Fouvy Leccia Sarmento Crisostomo", horarios: [] },
+    '10654': { nome: "Gabriela Pacheco Cavalcanti", horarios: [] },
+    '6975': { nome: "Gabriella Bento de Morais", horarios: [] },
+    '10414': { nome: "GILVANDRO DE ASSIS ABRANTES LEITE FILHO", horarios: [] },
+    '3961': { nome: "HENRIQUE COUTINHO OLIVEIRA", horarios: [] },
+    '8706': { nome: "ISABELLA ROLIM DANTAS", horarios: [] },
+    '3956': { nome: "ISAURA RAQUEL NOGUEIRA DE MEDEIROS", horarios: [] },
+    '5904': { nome: "JOANY LEANDRO FREIRE SILVA", horarios: [] },
+    '3945': { nome: "JOSE CARLOS DA SILVA", horarios: [] },
+    '3931': { nome: "Josemar Dos Santos Soares", horarios: [
+        { dia: 1, inicio: 8.5, fim: 18.5, unidade: "SOS OTORRINO TAMBAU 24 HRS" },
+        { dia: 3, inicio: 8.5, fim: 18.5, unidade: "SOS OTORRINO TAMBAU 24 HRS" }
+    ]},
+    '3932': { nome: "Kallyne Cavalcante Alves Castelo Branco", horarios: [] },
+    '4211': { nome: "KAMILA MEDEIROS DE OLIVEIRA", horarios: [] },
+    '3933': { nome: "Karla Renata Freire Meira", horarios: [] },
+    '3934': { nome: "Keylla Cavalcante Alves", horarios: [] },
+    '8685': { nome: "Lais Cristine Santiago Silva", horarios: [] },
+    '3935': { nome: "Leonardo Marques Araujo", horarios: [] },
+    '3936': { nome: "Lorena Pinto Pontes Crispim", horarios: [] },
+    '10653': { nome: "Lucas Dias Guaraná", horarios: [] },
+    '4556': { nome: "Lucas Marques Morais", horarios: [] },
+    '11993': { nome: "Lucas Valdonio Patrício Araújo", horarios: [] },
+    '3958': { nome: "LUCIANO COELHO", horarios: [] },
+    '3937': { nome: "Lucilene Lisboa Ferraz", horarios: [] },
+    '5932': { nome: "Luiz Guedes de Carvalho neto", horarios: [] },
+    '3954': { nome: "MARCELA ROLIM BONICIO CABRAL", horarios: [] },
+    '3938': { nome: "Marcelo Augusto Costa Romero", horarios: [] },
+    '3939': { nome: "Maria Do Socorro Sousa Marques", horarios: [] },
+    '3940': { nome: "Mariana Lima De Freitas", horarios: [] },
+    '3955': { nome: "MATHEUS PIRES BRAGA", horarios: [] },
+    '3948': { nome: "MONINE COUTO FARIAS BEM", horarios: [] },
+    '3949': { nome: "NATALIA CRISTINA AMARAL FRAGOSO", horarios: [] },
+    '3950': { nome: "NATALIA SILVA CAVALCANTI", horarios: [] },
+    '6345': { nome: "Nicole de Carvalho Dias", horarios: [] },
+    '3957': { nome: "Patricio José de Oliveira Neto", horarios: [] },
+    '3941': { nome: "Poliana Goncalves Vitorino Monteiro", horarios: [] },
+    '3952': { nome: "PRISCYLLA BATISTA DIAS", horarios: [] },
+    '6912': { nome: "Rafaella Case de Lima", horarios: [] },
+    '8705': { nome: "RAFAEL RODRIGUEZ TEIXEIRA DE CARVALHO", horarios: [] },
+    '4486': { nome: "Raquel Francy de Araújo e Vasconcelos", horarios: [] },
+    '10407': { nome: "RAVI RODRIGUES DE LIMA", horarios: [] },
+    '3943': { nome: "Rebeca Maurera Almeida Cyrillo", horarios: [
+        { dia: 1, inicio: 13, fim: 17, unidade: "SOS OTORRINO MANAIRA" },
+        { dia: 2, inicio: 9.5, fim: 12, unidade: "SOS OTORRINO MANAIRA" },
+        { dia: 3, inicio: 8, fim: 12, unidade: "SOS OTORRINO BESSA" },
+        { dia: 3, inicio: 13, fim: 17, unidade: "SOS OTORRINO TAMBAÚ DIA" },
+        { dia: 4, inicio: 13, fim: 17, unidade: "SOS OTORRINO MANAIRA" },
+        { dia: 5, inicio: 8, fim: 12, unidade: "SOS OTORRINO BESSA" }
+    ]},
+    '4786': { nome: "Ricardo Marques Coura Aragão", horarios: [] },
+    '4215': { nome: "Rubens Fernandes Botelho", horarios: [] },
+    '11995': { nome: "Thaliny Batista Sarmento de Oliveira", horarios: [] },
+    '6598': { nome: "THAYNA RAYNNA BRONZEADO LIMA", horarios: [] },
+    '4487': { nome: "Thiago Leite da Costa", horarios: [] },
+    '3953': { nome: "Veruska Lunguinho Oliveira de Pontes", horarios: [] },
+    '3944': { nome: "Vitor Thadeu Do Vale Vitorino", horarios: [] },
+    '3946': { nome: "Weidinara De Oliveira Rodrigues Da Fonseca", horarios: [] },
+    '3947': { nome: "Yuri Ferreira Maia", horarios: [] }
+};
+
+// ================== NAVEGAÇÃO ENTRE TELAS ==================
+btnAbrirAgenda.addEventListener('click', () => {
+  telaPrincipal.style.display = 'none';
+  telaAgenda.style.display = 'block';
+  carregarEditorAgenda();
+});
+
+btnVoltarAgenda.addEventListener('click', () => {
+  telaPrincipal.style.display = 'block';
+  telaAgenda.style.display = 'none';
+});
+
+function getIconeAnexo(tipo) {
+  if (tipo.startsWith('image/')) return 'image';
+  if (tipo === 'application/pdf') return 'picture_as_pdf';
+  if (tipo.includes('word') || tipo.includes('document')) return 'description';
+  if (tipo.includes('sheet') || tipo.includes('excel')) return 'table_chart';
+  if (tipo.includes('archive') || tipo.includes('zip')) return 'folder_zip';
+  return 'attachment';
+}
+
+function adicionarAnexo(arquivo) {
+  if (anexosTemporarios.length >= 10) {
+    return alert('Máximo de 10 anexos por mensagem!');
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const anexo = {
+      nome: arquivo.name,
+      tipo: arquivo.type || 'application/octet-stream',
+      tamanho: arquivo.size,
+      dados: e.target.result // Base64
+    };
+    anexosTemporarios.push(anexo);
+    exibirListaAnexos();
+  };
+  reader.onerror = () => alert('Erro ao ler o arquivo!');
+  reader.readAsDataURL(arquivo);
+}
+
+function removerAnexo(indice) {
+  anexosTemporarios.splice(indice, 1);
+  exibirListaAnexos();
+}
+
+function exibirListaAnexos() {
+  listaAnexos.innerHTML = '';
+  
+  if (anexosTemporarios.length === 0) {
+    return;
+  }
+
+  anexosTemporarios.forEach((anexo, indice) => {
+    const div = document.createElement('div');
+    div.className = 'item-anexo';
+    div.innerHTML = `
+      <div class="anexo-info">
+        <span class="anexo-icone material-icons-round">${getIconeAnexo(anexo.tipo)}</span>
+        <div>
+          <div class="anexo-nome" title="${anexo.nome}">${anexo.nome}</div>
+          <div class="anexo-tamanho">${formatarTamanhoBytesAnexo(anexo.tamanho)}</div>
+        </div>
+      </div>
+      <button type="button" class="btn-remover-anexo" title="Remover anexo">
+        <span class="material-icons-round">close</span>
+      </button>
+    `;
+    
+    div.querySelector('.btn-remover-anexo').addEventListener('click', () => removerAnexo(indice));
+    listaAnexos.appendChild(div);
+  });
+}
+
+btnAnexar.addEventListener('click', () => {
+  inputAnexo.click();
+});
+
+inputAnexo.addEventListener('change', (evento) => {
+  const arquivos = evento.target.files;
+  for (let arquivo of arquivos) {
+    adicionarAnexo(arquivo);
+  }
+  // Limpar o input para permitir selecionar o mesmo arquivo novamente
+  inputAnexo.value = '';
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   atualizarInterfacePastas();
   carregarMensagens();
+  inicializarAgenda();
 });
 
 campoBusca.addEventListener('input', (e) => {
@@ -42,8 +245,150 @@ btnFixar.addEventListener('click', () => {
   chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 440, height: 660 });
 });
 
+// ================== GERENCIAMENTO DE AGENDA ==================
+
+function inicializarAgenda() {
+  chrome.storage.local.get('mapeamentoAgenda', (data) => {
+    if (!data.mapeamentoAgenda) {
+      console.log("Inicializando agenda com dados padrão.");
+      chrome.storage.local.set({ mapeamentoAgenda: DADOS_INICIAIS_AGENDA });
+    }
+  });
+}
+
+function carregarEditorAgenda() {
+  chrome.storage.local.get('mapeamentoAgenda', (data) => {
+    const mapeamento = data.mapeamentoAgenda || {};
+    containerGerenciadorAgenda.innerHTML = '';
+
+    for (const medicoId in mapeamento) {
+      const medico = mapeamento[medicoId];
+      const medicoDiv = document.createElement('div');
+      medicoDiv.className = 'card medico-editor';
+      medicoDiv.setAttribute('data-medico-id', medicoId);
+      
+      let horariosHtml = medico.horarios.map((h, index) => criarHtmlHorario(medicoId, index, h)).join('');
+
+      medicoDiv.innerHTML = `
+        <div class="form-linha" style="align-items: flex-end;">
+          <div class="form-grupo">
+            <label>ID do Médico</label>
+            <input type="text" class="medico-id-input" value="${medicoId}" readonly style="background-color: #e2e8f0;">
+          </div>
+          <div class="form-grupo">
+            <label>Nome do Médico</label>
+            <input type="text" class="medico-nome-input" value="${medico.nome}">
+          </div>
+          <button class="btn-acao deletar-medico" title="Remover Médico"><span class="material-icons-round">delete</span></button>
+        </div>
+        <div class="secao-titulo" style="margin-top:10px;">Horários</div>
+        <div class="horarios-container">${horariosHtml}</div>
+        <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; margin-top: 8px;">+ Adicionar Horário</button>
+      `;
+      containerGerenciadorAgenda.appendChild(medicoDiv);
+    }
+    adicionarListenersAgenda();
+  });
+}
+
+function criarHtmlHorario(medicoId, horarioIndex, horario) {
+  const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  let optionsDia = dias.map((dia, i) => `<option value="${i}" ${i === horario.dia ? 'selected' : ''}>${dia}</option>`).join('');
+  let optionsUnidade = UNIDADES_DISPONIVEIS.map(unidade => `<option value="${unidade}" ${unidade === horario.unidade ? 'selected' : ''}>${unidade}</option>`).join('');
+
+  return `
+    <div class="form-linha horario-item" data-horario-index="${horarioIndex}" style="gap: 4px; align-items: center;">
+      <select class="horario-dia">${optionsDia}</select>
+      <input type="number" step="0.1" class="horario-inicio" placeholder="Início" value="${horario.inicio}">
+      <input type="number" step="0.1" class="horario-fim" placeholder="Fim" value="${horario.fim}">
+      <select class="horario-unidade">${optionsUnidade}</select>
+      <button class="btn-acao deletar-horario" title="Remover Horário"><span class="material-icons-round" style="font-size:16px;">close</span></button>
+    </div>
+  `;
+}
+
+function adicionarListenersAgenda() {
+  document.querySelectorAll('.deletar-medico').forEach(btn => btn.addEventListener('click', (e) => e.currentTarget.closest('.medico-editor').remove()));
+  document.querySelectorAll('.deletar-horario').forEach(btn => btn.addEventListener('click', (e) => e.currentTarget.closest('.horario-item').remove()));
+  document.querySelectorAll('.adicionar-horario').forEach(btn => btn.addEventListener('click', (e) => {
+    const container = e.currentTarget.previousElementSibling;
+    const medicoId = e.currentTarget.closest('.medico-editor').dataset.medicoId;
+    const novoIndex = container.children.length;
+    const novoHorarioHtml = criarHtmlHorario(medicoId, novoIndex, { dia: 1, inicio: '', fim: '', unidade: '' });
+    container.insertAdjacentHTML('beforeend', novoHorarioHtml);
+    adicionarListenersAgenda(); // Re-adiciona listeners para os novos botões
+  }));
+}
+
+btnAdicionarMedicoAgenda.addEventListener('click', () => {
+  const novoId = `medico_${Date.now()}`;
+  const medicoDiv = document.createElement('div');
+  medicoDiv.className = 'card medico-editor';
+  medicoDiv.setAttribute('data-medico-id', novoId);
+  medicoDiv.innerHTML = `
+    <div class="form-linha" style="align-items: flex-end;">
+      <div class="form-grupo">
+        <label>ID do Médico</label>
+        <input type="text" class="medico-id-input" value="${prompt('Digite o ID do novo médico (ex: 3943):', '') || novoId}">
+      </div>
+      <div class="form-grupo">
+        <label>Nome do Médico</label>
+        <input type="text" class="medico-nome-input" value="" placeholder="Nome completo do médico">
+      </div>
+      <button class="btn-acao deletar-medico" title="Remover Médico"><span class="material-icons-round">delete</span></button>
+    </div>
+    <div class="secao-titulo" style="margin-top:10px;">Horários</div>
+    <div class="horarios-container"></div>
+    <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; margin-top: 8px;">+ Adicionar Horário</button>
+  `;
+  containerGerenciadorAgenda.appendChild(medicoDiv);
+  adicionarListenersAgenda();
+});
+
+btnSalvarAgenda.addEventListener('click', () => {
+  const novoMapeamento = {};
+  const editores = document.querySelectorAll('.medico-editor');
+
+  for (const editor of editores) {
+    const idInput = editor.querySelector('.medico-id-input');
+    const nomeInput = editor.querySelector('.medico-nome-input');
+    const medicoId = idInput.value.trim();
+    const medicoNome = nomeInput.value.trim();
+
+    if (!medicoId || !medicoNome) {
+      alert('ID e Nome do Médico são obrigatórios.');
+      idInput.focus();
+      return;
+    }
+
+    const horarios = [];
+    const itensHorario = editor.querySelectorAll('.horario-item');
+    for (const item of itensHorario) {
+      const dia = parseFloat(item.querySelector('.horario-dia').value);
+      const inicio = parseFloat(item.querySelector('.horario-inicio').value);
+      const fim = parseFloat(item.querySelector('.horario-fim').value);
+      const unidade = item.querySelector('.horario-unidade').value.trim();
+
+      if (!isNaN(dia) && !isNaN(inicio) && !isNaN(fim) && unidade) {
+        horarios.push({ dia, inicio, fim, unidade });
+      }
+    }
+
+    novoMapeamento[medicoId] = {
+      nome: medicoNome,
+      horarios: horarios
+    };
+  }
+
+  chrome.storage.local.set({ mapeamentoAgenda: novoMapeamento }, () => {
+    alert('Agenda salva com sucesso!');
+    btnVoltarAgenda.click();
+  });
+});
+
 // ================== GERENCIAMENTO E EDIÇÃO DE PASTAS ==================
 btnCriarPasta.addEventListener('click', () => {
+  // ... (código existente)
   const nomePasta = novaPastaNome.value.trim();
   if (!nomePasta) return alert('Digite um nome válido para a pasta!');
   if (nomePasta.toLowerCase() === "outros") return alert('A pasta "Outros" é um diretório do sistema e não pode ser modificada.');
@@ -175,6 +520,7 @@ function deletarPasta(nome) {
 
 // ================== EXPORTAR / IMPORTAR ==================
 btnExportar.addEventListener('click', () => {
+  // ... (código existente)
   chrome.storage.local.get({ mensagens: [], pastas: [] }, (resultado) => {
     if (resultado.mensagens.length === 0) return alert('Nenhuma mensagem para exportar!');
     const dadosBackup = { mensagens: resultado.mensagens, pastas: resultado.pastas };
@@ -186,6 +532,7 @@ btnExportar.addEventListener('click', () => {
 });
 
 inputImportar.addEventListener('change', (evento) => {
+  // ... (código existente)
   const arquivo = evento.target.files[0];
   if (!arquivo) return;
   const leitor = new FileReader();
@@ -262,10 +609,20 @@ btnSalvar.addEventListener('click', () => {
       return alert('Este código de atalho já está sendo usado em outra mensagem!');
     }
     
+    const novaMensagem = { 
+      id: idMensagemEmEdicao || "msg_" + Date.now(), 
+      titulo, 
+      atalho, 
+      categoria, 
+      texto,
+      // Garante que o array de anexos seja salvo
+      anexos: anexosTemporarios 
+    };
+
     if (idMensagemEmEdicao) {
-      mensagens = mensagens.map(msg => msg.id === idMensagemEmEdicao ? { ...msg, titulo, atalho, categoria, texto } : msg);
+      mensagens = mensagens.map(msg => msg.id === idMensagemEmEdicao ? novaMensagem : msg);
     } else {
-      mensagens.push({ id: "msg_" + Date.now(), titulo, atalho, categoria, texto });
+      mensagens.push(novaMensagem);
     }
 
     chrome.storage.local.set({ mensagens }, () => {
@@ -403,10 +760,11 @@ function filtrarEExibirMensagens(termo) {
           <span class="item-titulo">${msg.titulo}</span>
           <div class="item-meta">
             ${msg.atalho ? `<span class="item-tag-atalho" style="color: var(--warning); font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 2px; margin-top: 2px;"><span class="material-icons-round" style="font-size:10px;">bolt</span> --${msg.atalho}</span>` : ''}
+            ${msg.anexos && msg.anexos.length > 0 ? `<span class="item-tag-anexo"><span class="material-icons-round">attach_file</span> ${msg.anexos.length}</span>` : ''}
           </div>
           <span class="item-preview" style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${msg.texto}</span>
         </div>
-        <div class="tooltip-previa"><strong>Prévia do Texto:</strong>\n\n${msg.texto}</div>
+        <div class="tooltip-previa"><strong>Prévia do Texto:</strong>\n\n${msg.texto}${msg.anexos && msg.anexos.length > 0 ? `\n\n📎 ${msg.anexos.length} anexo(s)` : ''}</div>
         <div class="acoes-item">
           <button class="btn-acao editar"><span class="material-icons-round" style="font-size: 18px;">edit</span></button>
           <button class="btn-acao deletar"><span class="material-icons-round" style="font-size: 18px;">delete_outline</span></button>
@@ -417,7 +775,7 @@ function filtrarEExibirMensagens(termo) {
 
       div.querySelector('.editar').addEventListener('click', (e) => { 
         e.stopPropagation(); 
-        prepararEdicao(msg.id, msg.titulo, msg.atalho, msg.categoria, msg.texto); 
+        prepararEdicao(msg.id, msg.titulo, msg.atalho, msg.categoria, msg.texto, msg.anexos || []); 
       });
       
       div.querySelector('.deletar').addEventListener('click', (e) => { 
@@ -473,12 +831,15 @@ function adicionarEventosDragAndDrop(elemento) {
   });
 }
 
-function prepararEdicao(id, titulo, atalho, category, texto) {
+function prepararEdicao(id, titulo, atalho, category, texto, anexos = []) {
   idMensagemEmEdicao = id;
   campoTitulo.value = titulo;
   campoAtalho.value = atalho || '';
   campoCategoria.value = category;
   campoTexto.value = texto;
+  // Carrega os anexos existentes para edição
+  anexosTemporarios = anexos || []; 
+  exibirListaAnexos();
   textoBotao.textContent = "Atualizar";
   iconeBotao.textContent = "edit";
   btnSalvar.classList.add('modo-edicao');
@@ -495,6 +856,9 @@ function resetarFormulario() {
   iconeBotao.textContent = "add_circle_outline";
   btnSalvar.classList.remove('modo-edicao');
   btnCancelar.style.display = "none";
+  // Limpa os anexos temporários
+  anexosTemporarios = []; 
+  exibirListaAnexos();
 }
 
 function deletarMensagem(id) {

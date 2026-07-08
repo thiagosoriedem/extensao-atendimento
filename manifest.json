@@ -5,7 +5,8 @@
   "permissions": [
     "storage",
     "contextMenus",
-    "scripting"
+    "scripting",
+    "clipboardWrite"
   ],
   "host_permissions": [
     "http://*/*",
@@ -19,8 +20,21 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["https://web.whatsapp.com/*"],
       "js": ["content.js"]
+    },
+    {
+      "matches": ["https://app.medicalsys.com.br/atendimento/agenda/calendario/*"],
+      "js": ["content-agenda.js"]
     }
-  ]
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["backup_padrao.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "128": "icone.png"
+  }
 }
