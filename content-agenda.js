@@ -105,23 +105,18 @@ async function trocarUnidade(unidadeNome) {
     }
 
     // 3. Clicar no link da clínica para trocar
-    // A função `trocar_clinica` já está no href, então não precisamos simular o clique no `<a>`
-    // mas sim executar a função que ele chama.
-    const href = linkClinica.getAttribute('href');
-    const match = href.match(/javascript:trocar_clinica\((\d+)\)/);
-    if (match) {
-        const clinicaId = match[1];
-        console.log(`Trocando para o ID da clínica: ${clinicaId}`);
-        // [CORREÇÃO] Injeta o script diretamente na página para garantir que ele possa chamar a função.
-        const script = document.createElement('script');
-        script.textContent = `trocar_clinica(${clinicaId});`;
-        (document.head||document.documentElement).appendChild(script);
-        script.remove();
+    if (simularClique(linkClinica)) {
+        console.log(`Clique simulado com sucesso no link da unidade: "${unidadeNome}"`);
+        // Remove o botão da tela para indicar que a ação foi concluída
+        const botaoTroca = document.getElementById('ts-troca-automatica');
+        if (botaoTroca) {
+            botaoTroca.remove();
+        }
     } else {
-        console.error("Não foi possível executar a função trocar_clinica.");
-        return; // Aborta se a função principal falhar
+        console.error(`Falha ao simular o clique no link da unidade: "${unidadeNome}"`);
     }
 
+    /*
     // 4. [CORREÇÃO] Usar MutationObserver para aguardar a atualização da UI de forma robusta
     // e então clicar no botão da unidade correta.
     const containerUnidades = document.querySelector('.selecao-unidades');
@@ -158,6 +153,7 @@ async function trocarUnidade(unidadeNome) {
     setTimeout(() => {
         observerUnidade.disconnect();
     }, 5000);
+    */
 }
 
 function injetarBotao(selectProfissional) {
@@ -172,6 +168,18 @@ function injetarBotao(selectProfissional) {
 
     if (!unidadeSugerida) {
         return; // Não faz nada se não houver sugestão
+    }
+
+    // Pega o nome da unidade atualmente selecionada na interface
+    const elementoUnidadeAtual = document.querySelector('.selecao-unidades button.btn-success span.nome_clinica_selecionada');
+    const unidadeAtual = elementoUnidadeAtual ? elementoUnidadeAtual.textContent.trim().toUpperCase() : null;
+
+    console.log(`Unidade Sugerida: ${unidadeSugerida.toUpperCase()}`);
+    console.log(`Unidade Atual na Tela: ${unidadeAtual}`);
+
+    // Só exibe o botão se a sugestão for diferente da unidade já selecionada
+    if (unidadeAtual && unidadeAtual === unidadeSugerida.toUpperCase()) {
+        return;
     }
 
     const medicoInfo = mapeamentoMedicoUnidade[medicoId];
