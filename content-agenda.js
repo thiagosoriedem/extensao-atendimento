@@ -98,7 +98,29 @@ function injetarBotao(selectProfissional) {
 
     // Só exibe o botão se a sugestão for diferente da unidade já selecionada
     if (unidadeAtual && unidadeAtual === unidadeSugerida.toUpperCase()) {
-        return;
+        const mensagemSucesso = document.createElement('div');
+        mensagemSucesso.id = 'ts-troca-automatica'; // Usa o mesmo ID para ser substituído
+        mensagemSucesso.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#166534" style="margin-right: 8px; flex-shrink: 0;">
+                <path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
+            </svg>
+            <span style="font-weight: 500;">Você já está na unidade correta:</span>
+            <strong style="margin-left: 5px;">${unidadeSugerida}</strong>
+        `;
+        Object.assign(mensagemSucesso.style, {
+            backgroundColor: '#f0fdf4', // Verde bem claro
+            border: '1px solid #86efac', // Borda verde clara
+            color: '#15803d', // Texto verde escuro
+            padding: '8px 12px',
+            borderRadius: '6px',
+            marginTop: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '13px'
+        });
+
+        selectProfissional.parentElement.insertAdjacentElement('afterend', mensagemSucesso);
+        return; // Para a execução aqui
     }
 
     const medicoInfo = mapeamentoMedicoUnidade[medicoId];
