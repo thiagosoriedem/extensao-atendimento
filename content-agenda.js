@@ -76,7 +76,7 @@ function trocarUnidade(unidadeNome) {
 }
 
 function injetarBotao(selectProfissional) {
-    // Remove o botão antigo, se houver
+    // Garante a remoção de qualquer botão ou mensagem anterior antes de processar.
     const botaoAntigo = document.getElementById('ts-troca-automatica');
     if (botaoAntigo) {
         botaoAntigo.remove();
@@ -161,35 +161,31 @@ function injetarBotao(selectProfissional) {
 }
 
 
-// Observador para detectar quando o select de profissionais é adicionado à página
-const observer = new MutationObserver((mutations, obs) => {
+// Abordagem mais robusta com MutationObserver para monitorar continuamente a página.
+// Isso garante que a funcionalidade seja re-aplicada mesmo se o elemento for recriado dinamicamente.
+const observer = new MutationObserver(() => {
     const selectProfissional = document.getElementById('calendarProfissional');
-    if (selectProfissional) {
-        console.log("Select 'calendarProfissional' encontrado.");
-        
+
+    // Garante que o elemento exista e que ainda não adicionamos nosso listener a ele.
+    if (selectProfissional && !selectProfissional.dataset.tsListenerAttached) {
+        console.log("TextSync: Select 'calendarProfissional' encontrado. Adicionando listener.");
+        selectProfissional.dataset.tsListenerAttached = 'true'; // Marca o elemento para evitar duplicidade de listeners
+
         // Adiciona o listener para o evento 'change'
         selectProfissional.addEventListener('change', () => {
+            console.log("TextSync: Médico alterado, verificando unidade...");
             injetarBotao(selectProfissional);
         });
 
-        // Verifica se já há um médico selecionado no carregamento
+        // Verifica se já há um médico selecionado no carregamento da página
         if (selectProfissional.value) {
             injetarBotao(selectProfissional);
         }
-
-        obs.disconnect(); // Para de observar uma vez que o elemento foi encontrado e o listener adicionado
-        // Não desconectamos mais o observer.
-        // Isso garante que, se o select for recriado dinamicamente na página
-        // (sem um reload completo), o listener seja adicionado novamente.
-        // obs.disconnect(); 
     }
 });
 
-// Inicia a observação no corpo do documento
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+// Inicia a observação no corpo do documento, monitorando adições/remoções de elementos na árvore.
+observer.observe(document.body, { childList: true, subtree: true });
 
 // Carrega os dados iniciais
 carregarMapeamento();
