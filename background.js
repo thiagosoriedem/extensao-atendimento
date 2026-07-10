@@ -73,6 +73,25 @@ chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
     enviarResposta({ status: "ok" });
     return true;
   }
+
+  // Ouve o pedido do content-agenda.js para trocar a unidade
+  if (requisicao.acao === "trocarUnidadeAgenda" && sender.tab) {
+    chrome.scripting.executeScript({
+      target: { tabId: sender.tab.id },
+      world: 'MAIN', // Executa no contexto da página, não no content script
+      func: (idClinica) => {
+        // Esta função é executada na página e tem acesso às funções dela
+        if (typeof listar_clinicas === 'function' && typeof trocar_clinica === 'function') {
+          console.log(`Executando troca para clínica ID: ${idClinica}`);
+          listar_clinicas(); // Abre o modal (pode ser necessário para a sessão)
+          trocar_clinica(idClinica); // Troca a clínica diretamente
+        } else {
+          console.error('As funções listar_clinicas ou trocar_clinica não estão disponíveis.');
+        }
+      },
+      args: [requisicao.idClinica]
+    });
+  }
 });
 
 function processarEInjetarTextoDoMenu(textoOriginal) {

@@ -59,101 +59,20 @@ const mapaUnidadeParaIdClinica = {
     "CAMPINA GRANDE - DESIGN MALL": "1424"
 };
 
-function simularClique(elemento) {
-    if (elemento) {
-        elemento.click();
-        return true;
-    }
-    return false;
-}
-
-async function trocarUnidade(unidadeNome) {
+function trocarUnidade(unidadeNome) {
     console.log(`Iniciando troca para unidade: ${unidadeNome}`);
-
-    // 1. Clicar no botão para abrir o modal de clínicas
-    const btnListarClinicas = document.querySelector('a[onclick="listar_clinicas()"]');
-    if (!simularClique(btnListarClinicas)) {
-        console.error("Botão 'listar_clinicas()' não encontrado.");
+    const idClinica = mapaUnidadeParaIdClinica[unidadeNome.toUpperCase()];
+    if (!idClinica) {
+        console.error(`ID da clínica para a unidade "${unidadeNome}" não encontrado.`);
         return;
     }
 
-    // 2. Aguardar o modal aparecer e encontrar a clínica correta
-    await new Promise(resolve => setTimeout(resolve, 500)); // Espera para o modal
-
-    const corpoModal = document.getElementById('body-modal-lista-clinicas');
-    if (!corpoModal) {
-        console.error("Modal de clínicas não foi encontrado.");
-        return;
-    }
-
-    let linkClinica = null;
-    const linhas = corpoModal.querySelectorAll('tr');
-    for (const linha of linhas) {
-        const nomeTd = linha.querySelector('td.text-left');
-        if (nomeTd && nomeTd.textContent.trim().toUpperCase() === unidadeNome.toUpperCase()) {
-            linkClinica = linha.querySelector('a[href*="trocar_clinica"]');
-            break;
-        }
-    }
-
-    if (!linkClinica) {
-        console.error(`Clínica "${unidadeNome}" não encontrada no modal.`);
-        // Tenta fechar o modal
-        const btnFechar = document.querySelector('#modal_lista_clinicas .modal-header button.close');
-        simularClique(btnFechar);
-        return;
-    }
-
-    // 3. Clicar no link da clínica para trocar
-    if (simularClique(linkClinica)) {
-        console.log(`Clique simulado com sucesso no link da unidade: "${unidadeNome}"`);
-        // Remove o botão da tela para indicar que a ação foi concluída
-        const botaoTroca = document.getElementById('ts-troca-automatica');
-        if (botaoTroca) {
-            botaoTroca.remove();
-        }
-    } else {
-        console.error(`Falha ao simular o clique no link da unidade: "${unidadeNome}"`);
-    }
-
-    /*
-    // 4. [CORREÇÃO] Usar MutationObserver para aguardar a atualização da UI de forma robusta
-    // e então clicar no botão da unidade correta.
-    const containerUnidades = document.querySelector('.selecao-unidades');
-    if (!containerUnidades) {
-        console.error("Container de seleção de unidades não encontrado para observar.");
-        return;
-    }
-    const observerUnidade = new MutationObserver((mutations, obs) => {
-        const idClinicaAlvo = mapaUnidadeParaIdClinica[unidadeNome.toUpperCase()];
-        if (!idClinicaAlvo) {
-            console.error(`ID da clínica para a unidade "${unidadeNome}" não encontrado no mapeamento.`);
-            obs.disconnect();
-            return;
-        }
-
-        // Tenta encontrar o botão da unidade alvo a cada mutação
-        const botaoUnidade = document.querySelector(`.selecao-unidades button input[idclinica="${idClinicaAlvo}"]`);
-        if (botaoUnidade && botaoUnidade.parentElement.style.display !== 'none') {
-            simularClique(botaoUnidade.parentElement); // Clica no <button> pai do <input>
-            console.log(`Unidade "${unidadeNome}" (ID: ${idClinicaAlvo}) selecionada com sucesso.`);
-            obs.disconnect(); // Para de observar após o sucesso
-        }
+    // Envia uma mensagem para o background script para executar a troca de unidade
+    // no contexto da página (MAIN world), contornando o CSP.
+    chrome.runtime.sendMessage({
+        acao: "trocarUnidadeAgenda",
+        idClinica: idClinica
     });
-
-    // Inicia a observação no container dos botões de unidade
-    observerUnidade.observe(containerUnidades, {
-        childList: true, // Observa adição/remoção de botões
-        subtree: true,   // Observa mudanças nos filhos dos botões
-        attributes: true, // Observa mudanças de atributos (como 'style')
-        attributeFilter: ['style'] // Foca em mudanças de estilo (display: none -> block)
-    });
-
-    // Adiciona um timeout de segurança para parar de observar após 5 segundos se nada acontecer
-    setTimeout(() => {
-        observerUnidade.disconnect();
-    }, 5000);
-    */
 }
 
 function injetarBotao(selectProfissional) {
@@ -237,6 +156,10 @@ const observer = new MutationObserver((mutations, obs) => {
         }
 
         obs.disconnect(); // Para de observar uma vez que o elemento foi encontrado e o listener adicionado
+        // Não desconectamos mais o observer.
+        // Isso garante que, se o select for recriado dinamicamente na página
+        // (sem um reload completo), o listener seja adicionado novamente.
+        // obs.disconnect(); 
     }
 });
 
