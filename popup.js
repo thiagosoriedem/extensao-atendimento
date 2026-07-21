@@ -34,6 +34,8 @@ const btnSalvarAgenda = document.getElementById('btnSalvarAgenda');
 const btnAdicionarMedicoAgenda = document.getElementById('btnAdicionarMedicoAgenda');
 const containerGerenciadorAgenda = document.getElementById('container-gerenciador-agenda');
 const campoBuscaAgenda = document.getElementById('campoBuscaAgenda');
+const btnExportarAgenda = document.getElementById('btnExportarAgenda');
+const inputImportarAgenda = document.getElementById('inputImportarAgenda');
 
 // Elementos de Navegação
 const navBtnMensagens = document.getElementById('nav-btn-mensagens');
@@ -59,92 +61,6 @@ const UNIDADES_DISPONIVEIS = [
     "SOS OTORRINO VALENTINA",
     "CAMPINA GRANDE - DESIGN MALL"
 ].sort();
-const DADOS_INICIAIS_AGENDA = {
-    '3926': { nome: "Adilson De Albuquerque Viana Junior", horarios: [] },
-    '3787': { nome: "Adriano Sergio Freire Meira", horarios: [] },
-    '10652': { nome: "Alaíse clementino guedes", horarios: [] },
-    '3927': { nome: "Alexandre Augusto de Brito Pereira Guimaraes", horarios: [] },
-    '3928': { nome: "Alvaro Vitorino de Pontes Junior", horarios: [] },
-    '4201': { nome: "AMANDA CAMARA MIRANDA", horarios: [] },
-    '4507': { nome: "Ana Carolina do Valle Dornelas", horarios: [] },
-    '4202': { nome: "Ana Isaura Dias Pessoa", horarios: [] },
-    '3960': { nome: "ANDRE ALBUQUERQUE SILVEIRA", horarios: [] },
-    '3942': { nome: "ANDRÉ PINTO VILLARIM", horarios: [] },
-    '5673': { nome: "Andreza Rodrigues Santos Martins", horarios: [] },
-    '11994': { nome: "Beatriz da Silva Araújo", horarios: [] },
-    '3929': { nome: "Bruno Leonardo Barbosa Machado", horarios: [
-        { dia: 1, inicio: 19, fim: 21.5, unidade: "SOS OTORRINO MANAIRA" },
-        { dia: 2, inicio: 8, fim: 12, unidade: "SOS OTORRINO TORRE" },
-        { dia: 5, inicio: 8, fim: 17.5, unidade: "SOS OTORRINO TORRE" }
-    ]},
-    '3930': { nome: "Christiane Kulzer Birck", horarios: [
-        { dia: 1, inicio: 8, fim: 12, unidade: "SOS OTORRINO MANAIRA" },
-        { dia: 3, inicio: 14, fim: 17, unidade: "SOS OTORRINO MANGABEIRA" },
-        { dia: 4, inicio: 8.5, fim: 12, unidade: "SOS OTORRINO TAMBAÚ DIA" }
-    ]},
-    '4205': { nome: "Cristian Luan Macena", horarios: [] },
-    '11558': { nome: "Danielly Francisco de Figueiredo", horarios: [] },
-    '3962': { nome: "Fábia Lívia Ramos Brilhante de França", horarios: [] },
-    '4209': { nome: "Fouvy Leccia Sarmento Crisostomo", horarios: [] },
-    '10654': { nome: "Gabriela Pacheco Cavalcanti", horarios: [] },
-    '6975': { nome: "Gabriella Bento de Morais", horarios: [] },
-    '10414': { nome: "GILVANDRO DE ASSIS ABRANTES LEITE FILHO", horarios: [] },
-    '3961': { nome: "HENRIQUE COUTINHO OLIVEIRA", horarios: [] },
-    '8706': { nome: "ISABELLA ROLIM DANTAS", horarios: [] },
-    '3956': { nome: "ISAURA RAQUEL NOGUEIRA DE MEDEIROS", horarios: [] },
-    '5904': { nome: "JOANY LEANDRO FREIRE SILVA", horarios: [] },
-    '3945': { nome: "JOSE CARLOS DA SILVA", horarios: [] },
-    '3931': { nome: "Josemar Dos Santos Soares", horarios: [
-        { dia: 1, inicio: 8.5, fim: 18.5, unidade: "SOS OTORRINO TAMBAU 24 HRS" },
-        { dia: 3, inicio: 8.5, fim: 18.5, unidade: "SOS OTORRINO TAMBAU 24 HRS" }
-    ]},
-    '3932': { nome: "Kallyne Cavalcante Alves Castelo Branco", horarios: [] },
-    '4211': { nome: "KAMILA MEDEIROS DE OLIVEIRA", horarios: [] },
-    '3933': { nome: "Karla Renata Freire Meira", horarios: [] },
-    '3934': { nome: "Keylla Cavalcante Alves", horarios: [] },
-    '8685': { nome: "Lais Cristine Santiago Silva", horarios: [] },
-    '3935': { nome: "Leonardo Marques Araujo", horarios: [] },
-    '3936': { nome: "Lorena Pinto Pontes Crispim", horarios: [] },
-    '10653': { nome: "Lucas Dias Guaraná", horarios: [] },
-    '4556': { nome: "Lucas Marques Morais", horarios: [] },
-    '11993': { nome: "Lucas Valdonio Patrício Araújo", horarios: [] },
-    '3958': { nome: "LUCIANO COELHO", horarios: [] },
-    '3937': { nome: "Lucilene Lisboa Ferraz", horarios: [] },
-    '5932': { nome: "Luiz Guedes de Carvalho neto", horarios: [] },
-    '3954': { nome: "MARCELA ROLIM BONICIO CABRAL", horarios: [] },
-    '3938': { nome: "Marcelo Augusto Costa Romero", horarios: [] },
-    '3939': { nome: "Maria Do Socorro Sousa Marques", horarios: [] },
-    '3940': { nome: "Mariana Lima De Freitas", horarios: [] },
-    '3955': { nome: "MATHEUS PIRES BRAGA", horarios: [] },
-    '3948': { nome: "MONINE COUTO FARIAS BEM", horarios: [] },
-    '3949': { nome: "NATALIA CRISTINA AMARAL FRAGOSO", horarios: [] },
-    '3950': { nome: "NATALIA SILVA CAVALCANTI", horarios: [] },
-    '6345': { nome: "Nicole de Carvalho Dias", horarios: [] },
-    '3957': { nome: "Patricio José de Oliveira Neto", horarios: [] },
-    '3941': { nome: "Poliana Goncalves Vitorino Monteiro", horarios: [] },
-    '3952': { nome: "PRISCYLLA BATISTA DIAS", horarios: [] },
-    '6912': { nome: "Rafaella Case de Lima", horarios: [] },
-    '8705': { nome: "RAFAEL RODRIGUEZ TEIXEIRA DE CARVALHO", horarios: [] },
-    '4486': { nome: "Raquel Francy de Araújo e Vasconcelos", horarios: [] },
-    '10407': { nome: "RAVI RODRIGUES DE LIMA", horarios: [] },
-    '3943': { nome: "Rebeca Maurera Almeida Cyrillo", horarios: [
-        { dia: 1, inicio: 13, fim: 17, unidade: "SOS OTORRINO MANAIRA" },
-        { dia: 2, inicio: 9.5, fim: 12, unidade: "SOS OTORRINO MANAIRA" },
-        { dia: 3, inicio: 8, fim: 12, unidade: "SOS OTORRINO BESSA" },
-        { dia: 3, inicio: 13, fim: 17, unidade: "SOS OTORRINO TAMBAÚ DIA" },
-        { dia: 4, inicio: 13, fim: 17, unidade: "SOS OTORRINO MANAIRA" },
-        { dia: 5, inicio: 8, fim: 12, unidade: "SOS OTORRINO BESSA" }
-    ]},
-    '4786': { nome: "Ricardo Marques Coura Aragão", horarios: [] },
-    '4215': { nome: "Rubens Fernandes Botelho", horarios: [] },
-    '11995': { nome: "Thaliny Batista Sarmento de Oliveira", horarios: [] },
-    '6598': { nome: "THAYNA RAYNNA BRONZEADO LIMA", horarios: [] },
-    '4487': { nome: "Thiago Leite da Costa", horarios: [] },
-    '3953': { nome: "Veruska Lunguinho Oliveira de Pontes", horarios: [] },
-    '3944': { nome: "Vitor Thadeu Do Vale Vitorino", horarios: [] },
-    '3946': { nome: "Weidinara De Oliveira Rodrigues Da Fonseca", horarios: [] },
-    '3947': { nome: "Yuri Ferreira Maia", horarios: [] }
-};
 
 // ================== NAVEGAÇÃO ENTRE TELAS ==================
 navBtnAgenda.addEventListener('click', () => {
@@ -241,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
   atualizarInterfacePastas();
   carregarMensagens();
   campoBuscaAgenda.addEventListener('input', filtrarMedicosAgenda);
+  inputImportarAgenda.addEventListener('change', importarDadosAgenda);
   inicializarAgenda();
 });
 
@@ -271,11 +188,59 @@ function filtrarMedicosAgenda() {
 
 function inicializarAgenda() {
   chrome.storage.local.get('mapeamentoAgenda', (data) => {
-    if (!data.mapeamentoAgenda) {
-      console.log("Inicializando agenda com dados padrão.");
-      chrome.storage.local.set({ mapeamentoAgenda: DADOS_INICIAIS_AGENDA });
+    // Se não houver agenda salva, busca do arquivo JSON padrão.
+    if (!data.mapeamentoAgenda || Object.keys(data.mapeamentoAgenda).length === 0) {
+      console.log("Nenhuma agenda encontrada. Carregando do arquivo 'agenda_padrao.json'...");
+      fetch(chrome.runtime.getURL('agenda_padrao.json'))
+        .then(response => response.json())
+        .then(dadosPadrao => {
+          chrome.storage.local.set({ mapeamentoAgenda: dadosPadrao }, () => {
+            console.log("Agenda padrão carregada e salva no armazenamento local.");
+          });
+        })
+        .catch(err => console.error("Erro ao carregar agenda padrão:", err));
     }
   });
+}
+
+btnExportarAgenda.addEventListener('click', () => {
+  chrome.storage.local.get('mapeamentoAgenda', (data) => {
+    if (!data.mapeamentoAgenda || Object.keys(data.mapeamentoAgenda).length === 0) {
+      return alert('Nenhum dado de agenda para exportar!');
+    }
+    const blob = new Blob([JSON.stringify(data.mapeamentoAgenda, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dataFormatada = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    a.href = url;
+    a.download = `backup_agenda_${dataFormatada}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+});
+
+function importarDadosAgenda(evento) {
+  const arquivo = evento.target.files[0];
+  if (!arquivo) return;
+
+  const leitor = new FileReader();
+  leitor.onload = (e) => {
+    try {
+      const dadosImportados = JSON.parse(e.target.result);
+
+      if (typeof dadosImportados !== 'object' || dadosImportados === null || Object.keys(dadosImportados).length === 0) {
+        throw new Error("Arquivo JSON inválido ou vazio.");
+      }
+
+      chrome.storage.local.set({ mapeamentoAgenda: dadosImportados }, () => {
+        alert('Dados da agenda importados com sucesso!');
+        carregarEditorAgenda(); // Recarrega a tela para exibir os novos dados
+      });
+    } catch (err) {
+      alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo JSON de agenda válido.');
+    }
+  };
+  leitor.readAsText(arquivo);
 }
 
 function carregarEditorAgenda() {
