@@ -414,6 +414,40 @@ function base64ParaArquivo(base64, nomeArquivo) {
 }
 
 /**
+ * Envia uma sequência de mensagens, uma por uma.
+ * @param {string[]} mensagens - Array com os textos das mensagens.
+ * @param {HTMLElement} campo - O campo de texto onde as mensagens serão inseridas.
+ * @param {number} index - O índice da mensagem atual a ser enviada.
+ */
+async function enviarMensagensEmSequencia(mensagens, campo, index = 0) {
+  if (index >= mensagens.length) {
+    campo.focus();
+    return; // Finaliza a recursão
+  }
+
+  const texto = mensagens[index].trim();
+  if (!texto) {
+    // Pula mensagens vazias e continua para a próxima
+    enviarMensagensEmSequencia(mensagens, campo, index + 1);
+    return;
+  }
+
+  campo.value = texto;
+  campo.dispatchEvent(new Event('input', { bubbles: true }));
+  campo.dispatchEvent(new Event('change', { bubbles: true }));
+
+  // Aguarda um instante para o WhatsApp processar o input
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  document.execCommand('insertText', false, ' '); // Truque para habilitar o botão de enviar
+  document.execCommand('delete');
+  document.execCommand('send'); // Comando que simula o envio
+
+  // Aguarda antes de enviar a próxima mensagem
+  setTimeout(() => enviarMensagensEmSequencia(mensagens, campo, index + 1), 300);
+}
+
+/**
  * Escreve os arquivos na área de transferência do navegador.
  * @param {Array} arquivos - Um array de objetos File para serem enviados.
  * @returns {Promise<boolean>} Retorna true se bem-sucedido, false caso contrário.
@@ -437,7 +471,7 @@ async function enviarAnexos(arquivos) {
   }
 }
 
-function inserirMensagemSelecionada(msg, termoParaRemover) {
+async function inserirMensagemSelecionada(msg, termoParaRemover) {
   if (!campoAtivo) return;
 
   let textoFinal = msg.texto;
@@ -472,26 +506,42 @@ function inserirMensagemSelecionada(msg, termoParaRemover) {
     }
   }
 
+  // Remove o termo do atalho (--atalho) do campo de texto
+  if (campoAtivo.value !== undefined) {
+    let valorCompleto = campoAtivo.value;
+    if (termoParaRemover && valorCompleto.includes(termoParaRemover)) {
+      const posicaoGatilho = valorCompleto.lastIndexOf(termoParaRemover);
+      campoAtivo.value = valorCompleto.substring(0, posicaoGatilho);
+      campoAtivo.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+  removerMenu();
+
+  // Verifica se há múltiplas mensagens para enviar
+  if (textoFinal.includes('[MSG]')) {
+    const mensagens = textoFinal.split('[MSG]');
+    enviarMensagensEmSequencia(mensagens, campoAtivo);
+    return;
+  }
+
   // LÓGICA DE ENVIO DE ANEXOS
   if (msg.anexos && msg.anexos.length > 0) {
-    (async () => {
-      const arquivosParaEnviar = msg.anexos.map(anexo => base64ParaArquivo(anexo.dados, anexo.nome)).filter(Boolean);
-      
-      if (arquivosParaEnviar.length > 0) {
-        const sucesso = await enviarAnexos(arquivosParaEnviar);
-        if (sucesso) {
-          // Garante que o campo de texto principal tenha o foco antes de colar.
-          campoAtivo.focus();
-          // Simula o comando 'colar' do usuário para que o WhatsApp abra a tela de anexo.
-          document.execCommand('paste');
-        }
+    const arquivosParaEnviar = msg.anexos.map(anexo => base64ParaArquivo(anexo.dados, anexo.nome)).filter(Boolean);
+    
+    if (arquivosParaEnviar.length > 0) {
+      const sucesso = await enviarAnexos(arquivosParaEnviar);
+      if (sucesso) {
+        // Garante que o campo de texto principal tenha o foco antes de colar.
+        campoAtivo.focus();
+        // Simula o comando 'colar' do usuário para que o WhatsApp abra a tela de anexo.
+        document.execCommand('paste');
       }
-      // Continua para colar o texto como legenda após um breve atraso.
-      colarTextoComoLegenda(textoFinal, termoParaRemover);
-    })();
+    }
+    // Continua para colar o texto como legenda após um breve atraso.
+    colarTextoComoLegenda(textoFinal);
   } else {
     // Se não houver anexos, cola o texto imediatamente.
-    colarTextoComoLegenda(textoFinal, termoParaRemover, 0);
+    colarTextoComoLegenda(textoFinal, 0);
   }
 }
 
@@ -500,23 +550,101 @@ function colarTextoComoLegenda(textoFinal, termoParaRemover, atraso = 150) {
     // Re-seleciona o campo ativo, que pode ter mudado para o campo de legenda do anexo.
     const campoAtual = document.activeElement;
     const campoFinal = (campoAtual && (campoAtual.value !== undefined || campoAtual.isContentEditable)) ? campoAtual : campoAtivo;
-
+    
     if (campoFinal.value !== undefined) {
-      let valorCompleto = campoFinal.value;
-      
-      if (termoParaRemover && valorCompleto.includes(termoParaRemover)) {
-        const posicaoGatilho = valorCompleto.lastIndexOf(termoParaRemover);
-        valorCompleto = valorCompleto.substring(0, posicaoGatilho) + valorCompleto.substring(posicaoGatilho + termoParaRemover.length);
-      }
-
-      campoFinal.value = valorCompleto + textoFinal;
+      campoFinal.value += textoFinal;
       
       // Dispara eventos para que o React do WhatsApp reconheça a mudança
       campoFinal.dispatchEvent(new Event('input', { bubbles: true }));
       campoFinal.dispatchEvent(new Event('change', { bubbles: true }));
     }
-
-    removerMenu();
     campoFinal.focus();
   }, atraso);
+}
+
+// ================== LÓGICA PARA PRÉ-VISUALIZAÇÃO NO NEORON ==================
+
+if (window.location.hostname === 'direct.neoron.io') {
+  let neoronTooltipTimer = null;
+  let neoronTooltipElement = null;
+  let lastHoveredItem = null;
+
+  const hideNeoronPreview = () => {
+    if (neoronTooltipTimer) {
+      clearTimeout(neoronTooltipTimer);
+      neoronTooltipTimer = null;
+    }
+    if (neoronTooltipElement) {
+      neoronTooltipElement.remove();
+      neoronTooltipElement = null;
+    }
+  };
+
+  const showNeoronPreview = (event) => {
+    lastHoveredItem = event.target.closest('span.nav-text');
+    if (!lastHoveredItem) return;
+
+    const chatMessageElement = lastHoveredItem.querySelector('p.queued-at > span[style="width: 100%;"]');
+    if (chatMessageElement) {
+      const messageText = chatMessageElement.textContent.trim();
+      if (messageText) {
+        createPreviewTooltip(event, messageText);
+      }
+    }
+  };
+
+  const createPreviewTooltip = (event, messageText) => {
+    hideNeoronPreview();
+
+    neoronTooltipTimer = setTimeout(() => {
+      neoronTooltipElement = document.createElement('div');
+      neoronTooltipElement.style.cssText = `
+        position: fixed;
+        background-color: #1e293b;
+        color: #f8fafc;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.5;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000000000;
+        max-width: 350px;
+        pointer-events: none;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        white-space: pre-wrap;
+        left: ${event.clientX + 15}px;
+        top: ${event.clientY + 15}px;
+      `;
+      neoronTooltipElement.textContent = messageText;
+      document.body.appendChild(neoronTooltipElement);
+    }, 500); // Atraso de 500ms para exibir
+  }
+
+  document.body.addEventListener('mouseover', showNeoronPreview);
+  document.body.addEventListener('mouseout', hideNeoronPreview);
+
+  // Observador para MODIFICAR o tooltip padrão do Neoron em vez de criar um novo.
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      mutation.addedNodes.forEach(node => {
+        // Verifica se o nó adicionado é o tooltip de chamada do Neoron
+        if (node.nodeType === 1 && node.matches('.ant-tooltip.call-metadata-tooltip')) {
+          const tooltipInner = node.querySelector('.ant-tooltip-inner');
+          if (tooltipInner) {
+            // Extrai a "Última mensagem" do texto do tooltip
+            const fullText = tooltipInner.innerText;
+            const match = fullText.match(/Última mensagem:\s*(.*)/);
+            const message = match ? match[1].trim() : fullText.trim();
+
+            // Modifica o conteúdo do tooltip original para mostrar apenas a mensagem
+            tooltipInner.innerText = message;
+            tooltipInner.style.whiteSpace = 'pre-wrap'; // Garante a quebra de linha
+            tooltipInner.style.textAlign = 'left';
+          }
+        }
+      });
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
 }

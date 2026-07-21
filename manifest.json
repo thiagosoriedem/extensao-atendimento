@@ -20,7 +20,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://web.whatsapp.com/*", "https://direct.neoron.io/*" ],
+      "matches": ["https://web.whatsapp.com/*", "https://direct.neoron.io/*", "https://app.chatseguro.net/*" ],
       "js": ["content.js"]
     },
     {
