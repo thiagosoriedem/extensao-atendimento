@@ -30,12 +30,14 @@ const listaAnexos = document.getElementById('listaAnexos');
 // Elementos da Agenda
 const telaPrincipal = document.getElementById('tela-principal');
 const telaAgenda = document.getElementById('tela-agenda');
-const btnAbrirAgenda = document.getElementById('btnAbrirAgenda');
-const btnVoltarAgenda = document.getElementById('btnVoltarAgenda');
 const btnSalvarAgenda = document.getElementById('btnSalvarAgenda');
 const btnAdicionarMedicoAgenda = document.getElementById('btnAdicionarMedicoAgenda');
 const containerGerenciadorAgenda = document.getElementById('container-gerenciador-agenda');
+const campoBuscaAgenda = document.getElementById('campoBuscaAgenda');
 
+// Elementos de Navegação
+const navBtnMensagens = document.getElementById('nav-btn-mensagens');
+const navBtnAgenda = document.getElementById('nav-btn-agenda');
 
 let idMensagemEmEdicao = null;
 let pastaEmEdicaoNome = null; // Controla se estamos renomeando uma pasta
@@ -145,15 +147,19 @@ const DADOS_INICIAIS_AGENDA = {
 };
 
 // ================== NAVEGAÇÃO ENTRE TELAS ==================
-btnAbrirAgenda.addEventListener('click', () => {
+navBtnAgenda.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
   telaAgenda.style.display = 'block';
+  navBtnMensagens.classList.remove('active');
+  navBtnAgenda.classList.add('active');
   carregarEditorAgenda();
 });
 
-btnVoltarAgenda.addEventListener('click', () => {
+navBtnMensagens.addEventListener('click', () => {
   telaPrincipal.style.display = 'block';
   telaAgenda.style.display = 'none';
+  navBtnAgenda.classList.remove('active');
+  navBtnMensagens.classList.add('active');
 });
 
 function getIconeAnexo(tipo) {
@@ -234,6 +240,7 @@ inputAnexo.addEventListener('change', (evento) => {
 document.addEventListener('DOMContentLoaded', () => {
   atualizarInterfacePastas();
   carregarMensagens();
+  campoBuscaAgenda.addEventListener('input', filtrarMedicosAgenda);
   inicializarAgenda();
 });
 
@@ -242,10 +249,25 @@ campoBusca.addEventListener('input', (e) => {
 });
 
 btnFixar.addEventListener('click', () => {
-  chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 440, height: 660 });
+  chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 580, height: 660 });
 });
 
 // ================== GERENCIAMENTO DE AGENDA ==================
+
+function filtrarMedicosAgenda() {
+  const termo = campoBuscaAgenda.value.toLowerCase().trim();
+  const medicos = containerGerenciadorAgenda.querySelectorAll('.medico-editor');
+
+  medicos.forEach(medicoDiv => {
+    const nomeMedicoInput = medicoDiv.querySelector('.medico-nome-input');
+    if (nomeMedicoInput) {
+      const nomeMedico = nomeMedicoInput.value.toLowerCase();
+      const visivel = nomeMedico.includes(termo);
+      // Usamos .closest() para garantir que pegamos o card inteiro do médico
+      medicoDiv.style.display = visivel ? 'block' : 'none';
+    }
+  });
+}
 
 function inicializarAgenda() {
   chrome.storage.local.get('mapeamentoAgenda', (data) => {
@@ -382,7 +404,7 @@ btnSalvarAgenda.addEventListener('click', () => {
 
   chrome.storage.local.set({ mapeamentoAgenda: novoMapeamento }, () => {
     alert('Agenda salva com sucesso!');
-    btnVoltarAgenda.click();
+    navBtnMensagens.click(); // Volta para a tela de mensagens
   });
 });
 

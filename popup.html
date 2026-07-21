@@ -22,18 +22,48 @@
       --border: #e2e8f0;
     }
 
+    /* Layout Principal */
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      width: 420px;
+      width: 560px; /* Largura aumentada para o novo layout */
+      height: 620px;
       margin: 0;
-      padding: 16px;
       background-color: var(--background);
       color: var(--text);
+      display: flex;
+      overflow: hidden;
     }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .header h2 { margin: 0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .header h2 span { color: var(--primary); }
+    .sidebar {
+      width: 140px;
+      background-color: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header { text-align: center; margin-bottom: 20px; }
+    .sidebar-header h2 { margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .sidebar-header h2 .material-icons-round { color: var(--primary); }
+    
+    .nav-links { display: flex; flex-direction: column; gap: 6px; }
+    .nav-link { background: none; border: none; border-radius: 8px; padding: 10px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; text-align: left; }
+    .nav-link:hover { background-color: var(--background); color: var(--text); }
+    .nav-link.active { background-color: #eff6ff; color: var(--primary); }
+    .nav-link .material-icons-round { font-size: 20px; }
+
+    .sidebar-footer { margin-top: auto; }
+
+    .main-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .header h2 { margin: 0; font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .header h2 .material-icons-round { color: var(--primary); }
     
     .btn-fixar { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 5px; display: flex; align-items: center; }
     .btn-fixar:hover { background-color: var(--border); color: var(--primary); }
@@ -125,16 +155,30 @@
   </style>
 </head>
 <body>
-  <!-- TELA PRINCIPAL -->
-  <div id="tela-principal">
-    <div class="header">
-      <h2><span class="material-icons-round">bolt</span><span>TextSync Ultra</span></h2>
-      <button id="btnFixar" class="btn-fixar" title="Fixar janela na tela">
-        <span class="material-icons-round">open_in_new</span>
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2><span class="material-icons-round">bolt</span><span>TextSync PRO</span></h2>
+    </div>
+    <div class="nav-links">
+      <button id="nav-btn-mensagens" class="nav-link active">
+        <span class="material-icons-round">chat</span>
+        <span>Mensagens</span>
+      </button>
+      <button id="nav-btn-agenda" class="nav-link">
+        <span class="material-icons-round">event_note</span>
+        <span>Agenda</span>
       </button>
     </div>
+    <div class="sidebar-footer">
+      <button id="btnFixar" class="nav-link" title="Fixar janela na tela" style="width: 100%; justify-content: center;">
+        <span class="material-icons-round">open_in_new</span>
+        <span>Fixar Janela</span>
+      </button>
+    </div>
+  </nav>
 
-    <div class="card">
+  <main class="main-content">
+    <div id="tela-principal">
       <label id="tituloSeçãoPasta">📂 Gerenciar Pastas / Subpastas</label>
     
       <div class="pasta-input-container">
@@ -147,82 +191,81 @@
         </button>
       </div>
       <div id="listaPastasGerenciador" class="lista-pastas-gerenciador"></div>
-    </div>
 
-    <div class="card">
-      <div class="form-linha">
-        <div class="form-grupo">
-          <label for="titulo">Título do Menu</label>
-          <input type="text" id="titulo" placeholder="Ex: Preparo BERA">
+      <div class="card" style="margin-top: 12px;">
+        <div class="form-linha">
+          <div class="form-grupo">
+            <label for="titulo">Título do Menu</label>
+            <input type="text" id="titulo" placeholder="Ex: Preparo BERA">
+          </div>
+          <div class="form-grupo" style="flex: 0 0 110px;">
+            <label for="atalho">Atalho (--)</label>
+            <input type="text" id="atalho" placeholder="Ex: bera">
+          </div>
         </div>
-        <div class="form-grupo" style="flex: 0 0 110px;">
-          <label for="atalho">Atalho (--)</label>
-          <input type="text" id="atalho" placeholder="Ex: bera">
+
+        <div class="form-linha">
+          <div class="form-grupo">
+            <label for="categoria">Designar para a Pasta</label>
+            <select id="categoria"></select>
+          </div>
+        </div>
+        
+        <label for="texto">Texto de Envio</label>
+        <textarea id="texto" placeholder="Utilize {nome}, {cpf}, {exame}, {convenio}, {medico}, {unidade}, {valor}, {data} e {hora} se necessário..."></textarea>
+        
+        <div class="anexos-container">
+          <button id="btnAnexar" class="btn-anexar" type="button" title="Anexar arquivo ou imagem">
+            <span class="material-icons-round">attach_file</span> Anexar Arquivo/Imagem
+          </button>
+          <input type="file" id="inputAnexo" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip">
+          <div id="listaAnexos" class="lista-anexos"></div>
+        </div>
+        
+        <div class="botoes-container">
+          <button id="btnCancelar" class="btn-cancelar">Cancelar</button>
+          <button id="btnSalvar" class="btn-principal">
+            <span id="iconeBotao" class="material-icons-round">add_circle_outline</span> 
+            <span id="textoBotao">Salvar Mensagem</span>
+          </button>
         </div>
       </div>
 
-      <div class="form-linha">
-        <div class="form-grupo">
-          <label for="categoria">Designar para a Pasta</label>
-          <select id="categoria"></select>
-        </div>
+      <div class="busca-container">
+        <span class="material-icons-round icon-busca">search</span>
+        <input type="text" id="campoBusca" placeholder="Pesquisar por título, texto ou atalho...">
       </div>
-      
-      <label for="texto">Texto de Envio</label>
-      <textarea id="texto" placeholder="Utilize {nome}, {cpf}, {exame}, {convenio}, {medico}, {unidade}, {valor}, {data} e {hora} se necessário..."></textarea>
-      
-      <div class="anexos-container">
-        <button id="btnAnexar" class="btn-anexar" type="button" title="Anexar arquivo ou imagem">
-          <span class="material-icons-round">attach_file</span> Anexar Arquivo/Imagem
+
+      <div class="secao-titulo">Sua Biblioteca (Arraste para reordenar)</div>
+      <div id="listaMensagens" class="lista-mensagens"></div>
+
+      <div class="backup-container">
+        <button id="btnCarregarPadrao" class="btn-backup" style="background-color: #eff6ff; border-color: #bfdbfe; color: var(--primary);" title="Carrega o arquivo backup_padrao.json da raiz">
+          <span class="material-icons-round" style="font-size:16px;">autorenew</span> Restaurar Padrão
         </button>
-        <input type="file" id="inputAnexo" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip">
-        <div id="listaAnexos" class="lista-anexos"></div>
-      </div>
-      
-      <div class="botoes-container">
-        <button id="btnCancelar" class="btn-cancelar">Cancelar</button>
-        <button id="btnSalvar" class="btn-principal">
-          <span id="iconeBotao" class="material-icons-round">add_circle_outline</span> 
-          <span id="textoBotao">Salvar Mensagem</span>
-        </button>
+        <button id="btnExportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_download</span> Exportar</button>
+        <label for="inputImportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_upload</span> Importar</label>
+        <input type="file" id="inputImportar" accept=".json">
       </div>
     </div>
 
-    <div class="busca-container">
-      <span class="material-icons-round icon-busca">search</span>
-      <input type="text" id="campoBusca" placeholder="Pesquisar por título, texto ou atalho...">
+    <div id="tela-agenda" style="display: none;">
+      <div class="header">
+        <h2><span class="material-icons-round">event_note</span><span>Editor de Agenda</span></h2>
+      </div>
+      <div class="busca-container">
+        <span class="material-icons-round icon-busca">search</span>
+        <input type="text" id="campoBuscaAgenda" placeholder="Pesquisar por nome do médico...">
+      </div>
+      <div id="container-gerenciador-agenda">
+        <!-- O conteúdo será gerado pelo popup.js -->
+      </div>
+      <div class="botoes-container" style="margin-top: 12px;">
+        <button id="btnAdicionarMedicoAgenda" class="btn-backup" style="flex: 0.5;"><span class="material-icons-round" style="font-size:16px;">person_add</span> Novo Médico</button>
+        <button id="btnSalvarAgenda" class="btn-principal" style="background-color: var(--primary);"><span class="material-icons-round" style="font-size:16px;">save</span> Salvar Agenda</button>
+      </div>
     </div>
-
-    <div class="secao-titulo">Sua Biblioteca (Arraste para reordenar)</div>
-    <div id="listaMensagens" class="lista-mensagens"></div>
-
-    <div class="backup-container">
-      <button id="btnCarregarPadrao" class="btn-backup" style="background-color: #eff6ff; border-color: #bfdbfe; color: var(--primary);" title="Carrega o arquivo backup_padrao.json da raiz">
-        <span class="material-icons-round" style="font-size:16px;">autorenew</span> Restaurar Padrão
-      </button>
-      <button id="btnExportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_download</span> Exportar</button>
-      <label for="inputImportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_upload</span> Importar</label>
-      <input type="file" id="inputImportar" accept=".json">
-      <button id="btnAbrirAgenda" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">event</span> Agenda</button>
-    </div>
-  </div>
-
-  <!-- TELA DE AGENDA (ESCONDIDA) -->
-  <div id="tela-agenda" style="display: none;">
-    <div class="header">
-      <h2><span class="material-icons-round" style="color: var(--primary)">event_note</span><span>Editor de Agenda</span></h2>
-      <button id="btnVoltarAgenda" class="btn-fixar" title="Voltar para mensagens">
-        <span class="material-icons-round">arrow_back</span>
-      </button>
-    </div>
-    <div id="container-gerenciador-agenda">
-      <!-- O conteúdo será gerado pelo popup.js -->
-    </div>
-    <div class="botoes-container" style="margin-top: 12px;">
-      <button id="btnAdicionarMedicoAgenda" class="btn-backup" style="flex: 0.5;"><span class="material-icons-round" style="font-size:16px;">person_add</span> Novo Médico</button>
-      <button id="btnSalvarAgenda" class="btn-principal" style="background-color: var(--primary);"><span class="material-icons-round" style="font-size:16px;">save</span> Salvar Agenda</button>
-    </div>
-  </div>
+  </main>
 
   <script src="popup.js"></script>
 </body>
