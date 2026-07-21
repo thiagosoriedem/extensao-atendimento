@@ -95,7 +95,9 @@
     .lista-pastas-gerenciador::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     
     .item-pasta-gerencia { display: flex; justify-content: space-between; align-items: center; background: var(--background); padding: 4px 8px; border-radius: 6px; margin-bottom: 4px; font-size: 12px; }
-    .item-pasta-nome { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%; }
+    .item-pasta-nome { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .item-pasta-cor { border: none; background: none; width: 20px; height: 20px; padding: 0; border-radius: 50%; cursor: pointer; margin-left: 8px; }
+    .item-pasta-cor::-webkit-color-swatch-wrapper { padding: 0; } .item-pasta-cor::-webkit-color-swatch { border: 1px solid var(--border); border-radius: 50%; }
 
     .busca-container { position: relative; margin-bottom: 12px; }
     .busca-container input { padding-left: 34px; background-color: var(--surface); }
@@ -112,12 +114,13 @@
     .item-mensagem.arrastando { opacity: 0.4; background-color: var(--background); border-style: dashed; }
     .item-mensagem.drag-over { border-top: 3px solid var(--primary); background-color: #eff6ff; }
 
-    .item-info { display: flex; flex-direction: column; max-width: 65%; pointer-events: none; }
+    .item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; pointer-events: none; }
     .item-titulo { font-weight: 600; font-size: 12px; color: var(--text); }
-    .item-meta { display: flex; gap: 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
-    .item-tag-cat { color: var(--primary); }
-    .item-tag-atalho { color: var(--warning); }
-    .item-preview { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .item-meta { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 600; margin-top: 4px; color: var(--text-secondary); }
+    .item-meta .material-icons-round { font-size: 12px; }
+    .item-categoria-path { display: flex; align-items: center; gap: 3px; }
+    .item-tag-atalho { display: flex; align-items: center; gap: 3px; color: var(--warning); }
+    .item-tag-anexo { display: flex; align-items: center; gap: 3px; color: var(--primary); }
     
     .acoes-item { display: flex; gap: 2px; }
     .btn-acao { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 5px; border-radius: 6px; display: flex; align-items: center; }
@@ -127,9 +130,6 @@
     .item-mensagem .tooltip-previa { visibility: hidden; width: 280px; background-color: #1e293b; color: #f8fafc; text-align: left; border-radius: 8px; padding: 10px; position: absolute; z-index: 999; top: 110%; left: 15px; bottom: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 11px; line-height: 1.4; white-space: pre-wrap; opacity: 0; transition: opacity 0.2s, visibility 0.2s; pointer-events: none; border: 1px solid #475569; }
     .item-mensagem .tooltip-previa::after { content: ""; position: absolute; bottom: 100%; left: 20px; top: auto; border-width: 5px; border-style: solid; border-color: transparent transparent #1e293b transparent; }
     body:not(.arrastando-ativo) .item-mensagem:hover .tooltip-previa { visibility: visible; opacity: 1; }
-
-    .item-meta .item-tag-anexo { color: var(--primary); font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 2px; margin-top: 2px; }
-    .item-meta .item-tag-anexo .material-icons-round { font-size: 10px; }
 
     .backup-container { display: flex; gap: 6px; background: var(--surface); padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
     .btn-backup { flex: 1; padding: 6px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }

@@ -45,6 +45,7 @@ let idMensagemEmEdicao = null;
 let pastaEmEdicaoNome = null; // Controla se estamos renomeando uma pasta
 let todasAsMensagens = [];
 let itemArrastado = null;
+let todasAsPastas = []; // Armazena as pastas com suas cores
 let anexosTemporarios = []; // Array para armazenar anexos antes de salvar
 
 const PASTAS_PADRAO = ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"];
@@ -248,8 +249,14 @@ function carregarEditorAgenda() {
     const mapeamento = data.mapeamentoAgenda || {};
     containerGerenciadorAgenda.innerHTML = '';
 
-    for (const medicoId in mapeamento) {
-      const medico = mapeamento[medicoId];
+    // Converte o objeto de mapeamento em um array para ordenação
+    const medicosOrdenados = Object.entries(mapeamento).sort(([, a], [, b]) => {
+      // Ordena pelo nome, ignorando maiúsculas/minúsculas e acentos
+      return a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' });
+    });
+
+    // Itera sobre o array ordenado para criar os elementos
+    for (const [medicoId, medico] of medicosOrdenados) {
       const medicoDiv = document.createElement('div');
       medicoDiv.className = 'card medico-editor';
       medicoDiv.setAttribute('data-medico-id', medicoId);
@@ -270,7 +277,10 @@ function carregarEditorAgenda() {
         </div>
         <div class="secao-titulo" style="margin-top:10px;">Horários</div>
         <div class="horarios-container">${horariosHtml}</div>
-        <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; margin-top: 8px;">+ Adicionar Horário</button>
+        <div class="botoes-container" style="margin-top: 8px; gap: 4px;">
+          <button class="btn-backup limpar-horarios" style="font-size:11px; padding: 4px 8px; flex: 0.5; background-color: #fff1f2; border-color: #ffdde0; color: var(--danger);"><span class="material-icons-round" style="font-size:14px;">delete_sweep</span> Limpar</button>
+          <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; flex: 1;">+ Adicionar Horário</button>
+        </div>
       `;
       containerGerenciadorAgenda.appendChild(medicoDiv);
     }
@@ -305,6 +315,12 @@ function adicionarListenersAgenda() {
     container.insertAdjacentHTML('beforeend', novoHorarioHtml);
     adicionarListenersAgenda(); // Re-adiciona listeners para os novos botões
   }));
+  document.querySelectorAll('.limpar-horarios').forEach(btn => btn.addEventListener('click', (e) => {
+    if (confirm('Tem certeza que deseja limpar todos os horários deste profissional?')) {
+      const container = e.currentTarget.closest('.medico-editor').querySelector('.horarios-container');
+      container.innerHTML = '';
+    }
+  }));
 }
 
 btnAdicionarMedicoAgenda.addEventListener('click', () => {
@@ -326,7 +342,10 @@ btnAdicionarMedicoAgenda.addEventListener('click', () => {
     </div>
     <div class="secao-titulo" style="margin-top:10px;">Horários</div>
     <div class="horarios-container"></div>
-    <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; margin-top: 8px;">+ Adicionar Horário</button>
+    <div class="botoes-container" style="margin-top: 8px; gap: 4px;">
+      <button class="btn-backup limpar-horarios" style="font-size:11px; padding: 4px 8px; flex: 0.5; background-color: #fff1f2; border-color: #ffdde0; color: var(--danger);"><span class="material-icons-round" style="font-size:14px;">delete_sweep</span> Limpar</button>
+      <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; flex: 1;">+ Adicionar Horário</button>
+    </div>
   `;
   containerGerenciadorAgenda.appendChild(medicoDiv);
   adicionarListenersAgenda();
@@ -379,22 +398,22 @@ btnCriarPasta.addEventListener('click', () => {
   const nomePasta = novaPastaNome.value.trim();
   if (!nomePasta) return alert('Digite um nome válido para a pasta!');
   if (nomePasta.toLowerCase() === "outros") return alert('A pasta "Outros" é um diretório do sistema e não pode ser modificada.');
-
-  chrome.storage.local.get({ pastas: PASTAS_PADRAO }, (resultado) => {
-    let listaPastas = resultado.pastas;
+  
+  chrome.storage.local.get({ pastas: [] }, (resultado) => {
+    let listaPastas = migrarEstruturaPastas(resultado.pastas);
 
     if (pastaEmEdicaoNome) {
       // MODO EDIÇÃO DE PASTA
-      if (listaPastas.map(p => p.toLowerCase()).includes(nomePasta.toLowerCase()) && nomePasta.toLowerCase() !== pastaEmEdicaoNome.toLowerCase()) {
+      if (listaPastas.some(p => p.nome.toLowerCase() === nomePasta.toLowerCase() && p.nome.toLowerCase() !== pastaEmEdicaoNome.toLowerCase())) {
         return alert('Já existe outra pasta com este nome!');
       }
 
       // 1. Atualiza o nome no array de pastas
-      listaPastas = listaPastas.map(p => p === pastaEmEdicaoNome ? nomePasta : p);
+      listaPastas = listaPastas.map(p => p.nome === pastaEmEdicaoNome ? { ...p, nome: nomePasta } : p);
 
       // 2. Varre as mensagens e migra as que pertenciam à pasta antiga para a nova automaticamente
       chrome.storage.local.get({ mensagens: [] }, (resMsg) => {
-        const mensagensAtualizadas = resMsg.mensagens.map(msg => {
+        const mensagensAtualizadas = (resMsg.mensagens || []).map(msg => {
           if (msg.categoria === pastaEmEdicaoNome) {
             return { ...msg, categoria: nomePasta };
           }
@@ -412,10 +431,10 @@ btnCriarPasta.addEventListener('click', () => {
 
     } else {
       // MODO CRIAÇÃO DE PASTA
-      if (listaPastas.map(p => p.toLowerCase()).includes(nomePasta.toLowerCase())) {
+      if (listaPastas.some(p => p.nome.toLowerCase() === nomePasta.toLowerCase())) {
         return alert('Esta pasta já existe!');
       }
-      listaPastas.push(nomePasta);
+      listaPastas.push({ nome: nomePasta, cor: null });
       listaPastas.sort();
 
       chrome.storage.local.set({ pastas: listaPastas }, () => {
@@ -429,34 +448,63 @@ btnCriarPasta.addEventListener('click', () => {
 
 btnCancelarEdicaoPasta.addEventListener('click', resetarFormularioPasta);
 
+function migrarEstruturaPastas(pastas) {
+  if (!pastas || pastas.length === 0) {
+    return PASTAS_PADRAO.map(p => ({ nome: p, cor: null }));
+  }
+  // Se o primeiro item for uma string, assume que a estrutura toda é antiga
+  if (typeof pastas[0] === 'string') {
+    return pastas.map(p => ({ nome: p, cor: null }));
+  }
+  return pastas;
+}
+
 function atualizarInterfacePastas() {
-  chrome.storage.local.get({ pastas: PASTAS_PADRAO }, (resultado) => {
+  chrome.storage.local.get({ pastas: [] }, (resultado) => {
+    todasAsPastas = migrarEstruturaPastas(resultado.pastas);
+    todasAsPastas.sort((a, b) => a.nome.localeCompare(b.nome));
+
     // 1. Atualiza o seletor dropdown das mensagens
     campoCategoria.innerHTML = '';
-    resultado.pastas.forEach(pasta => {
+    todasAsPastas.forEach(pastaObj => {
       const opt = document.createElement('option');
-      opt.value = pasta; opt.textContent = pasta;
+      opt.value = pastaObj.nome; 
+      opt.textContent = pastaObj.nome;
       campoCategoria.appendChild(opt);
     });
 
     // 2. Desenha a lista de gerenciamento (Lápis e Lixeira)
     listaPastasGerenciador.innerHTML = '';
-    resultado.pastas.forEach(pasta => {
+    todasAsPastas.forEach(pastaObj => {
+      const pastaNome = pastaObj.nome;
+      const pastaCor = pastaObj.cor || '#e2e8f0'; // Cor padrão se não houver
+
       // "Outros" não deve ser editada ou deletada para evitar bugs estruturais
-      if (pasta === "Outros") return;
+      if (pastaNome === "Outros") return;
 
       const div = document.createElement('div');
       div.className = 'item-pasta-gerencia';
       div.innerHTML = `
-        <span class="item-pasta-nome" title="${pasta}">${pasta}</span>
+        <span class="item-pasta-nome" title="${pastaNome}">${pastaNome}</span>
         <div class="acoes-item">
+          <input type="color" class="item-pasta-cor" value="${pastaCor}" title="Alterar cor da pasta">
           <button class="btn-acao editar-pasta" style="padding:2px;" title="Renomear Pasta"><span class="material-icons-round" style="font-size:14px; color:var(--warning);">edit</span></button>
           <button class="btn-acao deletar-pasta" style="padding:2px;" title="Excluir Pasta e mover mensagens para 'Outros'"><span class="material-icons-round" style="font-size:14px; color:var(--danger);">delete</span></button>
         </div>
       `;
 
-      div.querySelector('.editar-pasta').addEventListener('click', () => prepararEdicaoPasta(pasta));
-      div.querySelector('.deletar-pasta').addEventListener('click', () => deletarPasta(pasta));
+      div.querySelector('.editar-pasta').addEventListener('click', () => prepararEdicaoPasta(pastaNome));
+      div.querySelector('.deletar-pasta').addEventListener('click', () => deletarPasta(pastaNome));
+      
+      const inputCor = div.querySelector('.item-pasta-cor');
+      inputCor.addEventListener('change', (e) => {
+        const novaCor = e.target.value;
+        const pastaIndex = todasAsPastas.findIndex(p => p.nome === pastaNome);
+        if (pastaIndex > -1) {
+          todasAsPastas[pastaIndex].cor = novaCor;
+          chrome.storage.local.set({ pastas: todasAsPastas }, () => carregarMensagens());
+        }
+      });
 
       listaPastasGerenciador.appendChild(div);
     });
@@ -484,11 +532,12 @@ function resetarFormularioPasta() {
 
 function deletarPasta(nome) {
   if (confirm(`Tem certeza que deseja excluir a pasta "${nome}"? As mensagens contidas nela serão movidas para a pasta "Outros".`)) {
-    chrome.storage.local.get({ pastas: PASTAS_PADRAO, mensagens: [] }, (resultado) => {
-      const pastasFiltradas = resultado.pastas.filter(p => p !== nome);
+    chrome.storage.local.get({ pastas: [], mensagens: [] }, (resultado) => {
+      const pastasAtuais = migrarEstruturaPastas(resultado.pastas);
+      const pastasFiltradas = pastasAtuais.filter(p => p.nome !== nome);
       
       // Move os textos órfãos da pasta deletada para a pasta "Outros"
-      const mensagensTratadas = resultado.mensagens.map(msg => {
+      const mensagensTratadas = (resultado.mensagens || []).map(msg => {
         if (msg.categoria === nome) {
           return { ...msg, categoria: "Outros" };
         }
@@ -508,9 +557,12 @@ function deletarPasta(nome) {
 // ================== EXPORTAR / IMPORTAR ==================
 btnExportar.addEventListener('click', () => {
   // ... (código existente)
-  chrome.storage.local.get({ mensagens: [], pastas: [] }, (resultado) => {
-    if (resultado.mensagens.length === 0) return alert('Nenhuma mensagem para exportar!');
-    const dadosBackup = { mensagens: resultado.mensagens, pastas: resultado.pastas };
+  chrome.storage.local.get({ mensagens: [], pastas: [] }, (data) => {
+    const mensagens = data.mensagens || [];
+    const pastas = migrarEstruturaPastas(data.pastas);
+
+    if (mensagens.length === 0) return alert('Nenhuma mensagem para exportar!');
+    const dadosBackup = { mensagens: mensagens, pastas: pastas };
     const blob = new Blob([JSON.stringify(dadosBackup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -527,20 +579,17 @@ inputImportar.addEventListener('change', (evento) => {
     try {
       const dados = JSON.parse(e.target.result);
       
-      // Captura as mensagens e as pastas do arquivo de backup
       const mensagensImportar = Array.isArray(dados) ? dados : (dados.mensagens || []);
-      const pastasImportar = Array.isArray(dados) ? [] : (dados.pastas || []);
+      const pastasImportarRaw = Array.isArray(dados) ? [] : (dados.pastas || []);
+      const pastasImportar = migrarEstruturaPastas(pastasImportarRaw);
 
       if (mensagensImportar.length === 0) return alert('Nenhum dado válido encontrado no arquivo.');
 
-      chrome.storage.local.get({ 
-        mensagens: [], 
-        pastas: ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"] 
-      }, (resultado) => {
-        const atuaisMensagens = resultado.mensagens;
-        let atuaisPastas = resultado.pastas;
+      chrome.storage.local.get({ mensagens: [], pastas: [] }, (resultado) => {
+        const atuaisMensagens = resultado.mensagens || [];
+        let atuaisPastas = migrarEstruturaPastas(resultado.pastas);
+        const mapaPastasAtuais = new Map(atuaisPastas.map(p => [p.nome, p]));
 
-        // 1. Trata e limpa os IDs e atalhos das mensagens importadas
         const tratadas = mensagensImportar.map((msg, index) => ({
           id: "msg_" + Date.now() + "_" + index + "_" + Math.floor(Math.random() * 1000),
           titulo: msg.titulo || "Sem Título",
@@ -549,22 +598,20 @@ inputImportar.addEventListener('change', (evento) => {
           texto: msg.texto || ""
         }));
 
-        // 2. AUTOMAÇÃO DE SEGURANÇA: Garante que as pastas das mensagens importadas sejam criadas
         tratadas.forEach(msg => {
-          if (msg.categoria && !atuaisPastas.includes(msg.categoria)) {
-            atuaisPastas.push(msg.categoria);
+          if (msg.categoria && !mapaPastasAtuais.has(msg.categoria)) {
+            mapaPastasAtuais.set(msg.categoria, { nome: msg.categoria, cor: null });
           }
         });
 
-        // Adiciona também as pastas explícitas do bloco de backup (se houver)
         pastasImportar.forEach(p => {
-          if (p && !atuaisPastas.includes(p)) atuaisPastas.push(p);
+          if (p.nome && !mapaPastasAtuais.has(p.nome)) {
+            mapaPastasAtuais.set(p.nome, p);
+          }
         });
 
-        // Ordena a lista final de pastas em ordem alfabética
-        atuaisPastas.sort();
+        const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
 
-        // 3. Grava tudo de uma vez só no banco de dados local do computador novo
         chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: atuaisPastas }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
@@ -684,6 +731,9 @@ function filtrarEExibirMensagens(termo) {
       blocoGrupo.style.marginBottom = '6px';
       // Aplica um recuo progressivo para a direita para marcar as subpastas
       blocoGrupo.style.marginLeft = nivelHierarquia > 1 ? '14px' : '0px';
+      
+      const pastaInfo = todasAsPastas.find(p => p.nome.endsWith(nomeNo));
+      const corPasta = pastaInfo?.cor || 'var(--primary)';
 
       blocoGrupo.innerHTML = `
         <div class="pasta-header-titulo" style="display: flex; align-items: center; justify-content: space-between; background: ${nivelHierarquia > 1 ? '#f8fafc' : '#f1f5f9'}; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; user-select: none; margin-bottom: 4px;">
@@ -700,6 +750,7 @@ function filtrarEExibirMensagens(termo) {
       areaFilhos = blocoGrupo.querySelector('.conteudo-ramificacao-pasta');
       const iconePasta = blocoGrupo.querySelector('.icone-pasta-estado');
       const iconeSeta = blocoGrupo.querySelector('.icone-seta-estado');
+      iconePasta.style.color = corPasta;
 
       // Expandir / Recolher ao clicar na pasta
       headerClicavel.addEventListener('click', (e) => {
@@ -742,16 +793,19 @@ function filtrarEExibirMensagens(termo) {
       div.style.marginLeft = nivelHierarquia > 0 ? '8px' : '0px';
       div.style.marginBottom = '4px';
 
+      const pastaDaMsg = todasAsPastas.find(p => p.nome === msg.categoria);
+      const corDaPasta = pastaDaMsg?.cor || 'var(--text-secondary)';
+
       div.innerHTML = `
         <div class="item-info">
-          <span class="item-titulo">${msg.titulo}</span>
-          <div class="item-meta">
-            ${msg.atalho ? `<span class="item-tag-atalho" style="color: var(--warning); font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 2px; margin-top: 2px;"><span class="material-icons-round" style="font-size:10px;">bolt</span> --${msg.atalho}</span>` : ''}
-            ${msg.anexos && msg.anexos.length > 0 ? `<span class="item-tag-anexo"><span class="material-icons-round">attach_file</span> ${msg.anexos.length}</span>` : ''}
+          <span class="item-titulo" style="color: ${corDaPasta};">${msg.titulo}</span>
+          <div class="item-meta" title="Pasta: ${msg.categoria}">
+            <span class="item-categoria-path"><span class="material-icons-round">folder_open</span> ${msg.categoria.split(' > ').pop()}</span>
+            ${msg.atalho ? `· <span class="item-tag-atalho"><span class="material-icons-round">bolt</span> --${msg.atalho}</span>` : ''}
+            ${msg.anexos && msg.anexos.length > 0 ? `· <span class="item-tag-anexo"><span class="material-icons-round">attach_file</span> ${msg.anexos.length}</span>` : ''}
           </div>
-          <span class="item-preview" style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${msg.texto}</span>
         </div>
-        <div class="tooltip-previa"><strong>Prévia do Texto:</strong>\n\n${msg.texto}${msg.anexos && msg.anexos.length > 0 ? `\n\n📎 ${msg.anexos.length} anexo(s)` : ''}</div>
+        <div class="tooltip-previa"><strong>${msg.titulo}</strong>\n\n${msg.texto}${msg.anexos && msg.anexos.length > 0 ? `\n\n📎 ${msg.anexos.length} anexo(s)` : ''}</div>
         <div class="acoes-item">
           <button class="btn-acao editar"><span class="material-icons-round" style="font-size: 18px;">edit</span></button>
           <button class="btn-acao deletar"><span class="material-icons-round" style="font-size: 18px;">delete_outline</span></button>
@@ -880,11 +934,11 @@ btnCarregarPadrao.addEventListener('click', () => {
       }
 
       chrome.storage.local.get({ 
-        mensagens: [], 
-        pastas: ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"] 
+        mensagens: [],
+        pastas: []
       }, (resultado) => {
-        const atuaisMensagens = resultado.mensagens;
-        let atuaisPastas = resultado.pastas;
+        const atuaisMensagens = resultado.mensagens || [];
+        let atuaisPastas = migrarEstruturaPastas(resultado.pastas);
 
         // Processa as mensagens do arquivo padrão gerando IDs únicos para o PC novo
         const tratadas = mensagensImportar.map((msg, index) => ({
@@ -897,19 +951,22 @@ btnCarregarPadrao.addEventListener('click', () => {
 
         // Garante a criação automática das pastas das mensagens
         tratadas.forEach(msg => {
-          if (msg.categoria && !atuaisPastas.includes(msg.categoria)) {
-            atuaisPastas.push(msg.categoria);
+          if (msg.categoria && !atuaisPastas.some(p => p.nome === msg.categoria)) {
+            atuaisPastas.push({ nome: msg.categoria, cor: null });
           }
         });
 
         pastasImportar.forEach(p => {
-          if (p && !atuaisPastas.includes(p)) atuaisPastas.push(p);
+          if (p.nome && !atuaisPastas.some(pasta => pasta.nome === p.nome)) {
+            atuaisPastas.push(p);
+          }
         });
 
-        atuaisPastas.sort();
+        atuaisPastas.sort((a, b) => a.nome.localeCompare(b.nome));
 
         // Salva tudo de uma vez no banco local deste computador
-        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: atuaisPastas }, () => {
+        const mensagensFinais = [...atuaisMensagens, ...tratadas];
+        chrome.storage.local.set({ mensagens: mensagensFinais, pastas: atuaisPastas }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
