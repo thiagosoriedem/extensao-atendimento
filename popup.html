@@ -168,6 +168,10 @@
         <span class="material-icons-round">event_note</span>
         <span>Agenda</span>
       </button>
+      <button id="nav-btn-remarcacao" class="nav-link">
+        <span class="material-icons-round">swap_horiz</span>
+        <span>Remarcação</span>
+      </button>
     </div>
     <div class="sidebar-footer">
       <button id="btnFixar" class="nav-link" title="Fixar janela na tela" style="width: 100%; justify-content: center;">
@@ -246,6 +250,37 @@
         <button id="btnExportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_download</span> Exportar</button>
         <label for="inputImportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_upload</span> Importar</label>
         <input type="file" id="inputImportar" accept=".json">
+      </div>
+    </div>
+
+    <div id="tela-remarcacao" style="display: none;">
+      <div class="header">
+        <h2><span class="material-icons-round" style="color: var(--warning);">swap_horiz</span><span>Remarcação em Lote</span></h2>
+      </div>
+      <div class="card">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 0; line-height: 1.5;">
+          Esta ferramenta move <strong>todos</strong> os agendamentos de uma agenda de origem para uma de destino em uma nova data.
+          <br><strong style="color: var(--danger);">Atenção:</strong> Certifique-se de que a <strong>agenda de origem</strong> correta está selecionada na página do MedicalSys antes de iniciar.
+        </p>
+        <div class="form-grupo" style="margin-top: 16px;">
+          <label for="remarcacao-agenda-origem">Agenda de Origem (Atual na página)</label>
+          <select id="remarcacao-agenda-origem"></select>
+        </div>
+        <div class="form-grupo" style="margin-top: 10px;">
+          <label for="remarcacao-agenda-destino">Mover para a Agenda de Destino</label>
+          <select id="remarcacao-agenda-destino"></select>
+        </div>
+        <div class="form-grupo" style="margin-top: 10px;">
+          <label for="remarcacao-nova-data">Nova Data para Remarcação</label>
+          <input type="date" id="remarcacao-nova-data">
+        </div>
+        <div class="form-grupo" style="margin-top: 10px;">
+          <label for="remarcacao-observacao">Observação para Remarcação</label>
+          <textarea id="remarcacao-observacao" placeholder="Use {data_original} e {data_nova} como tags." style="height: 60px;"></textarea>
+        </div>
+        <div class="botoes-container" style="margin-top: 16px;">
+          <button id="btnIniciarRemarcacao" class="btn-principal" style="background-color: var(--warning);"><span class="material-icons-round">play_circle_outline</span> Iniciar Remarcação em Lote</button>
+        </div>
       </div>
     </div>
 

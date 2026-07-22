@@ -91,6 +91,20 @@ chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
       },
       args: [requisicao.idClinica]
     });
+    return true;
+  }
+
+  // Ouve o pedido do popup.js para iniciar a remarcação em lote
+  if (requisicao.acao === 'iniciarRemarcacaoLote') {
+    // Encontra a aba ativa do MedicalSys para enviar o comando
+    chrome.tabs.query({ active: true, url: "*://app.medicalsys.com.br/atendimento/agenda/calendario/*" }, (tabs) => {
+      if (tabs.length > 0) {
+        chrome.tabs.sendMessage(tabs[0].id, requisicao);
+      } else {
+        alert('Nenhuma aba da agenda do MedicalSys foi encontrada. Por favor, navegue até a agenda e tente novamente.');
+      }
+    });
+    return true; // Manter canal aberto para respostas assíncronas
   }
 });
 

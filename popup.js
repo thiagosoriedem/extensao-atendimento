@@ -37,6 +37,15 @@ const campoBuscaAgenda = document.getElementById('campoBuscaAgenda');
 const btnExportarAgenda = document.getElementById('btnExportarAgenda');
 const inputImportarAgenda = document.getElementById('inputImportarAgenda');
 
+// Elementos da Remarcação
+const telaRemarcacao = document.getElementById('tela-remarcacao');
+const navBtnRemarcacao = document.getElementById('nav-btn-remarcacao');
+const remarcacaoAgendaOrigem = document.getElementById('remarcacao-agenda-origem');
+const remarcacaoAgendaDestino = document.getElementById('remarcacao-agenda-destino');
+const remarcacaoNovaData = document.getElementById('remarcacao-nova-data');
+const remarcacaoObservacao = document.getElementById('remarcacao-observacao');
+const btnIniciarRemarcacao = document.getElementById('btnIniciarRemarcacao');
+
 // Elementos de Navegação
 const navBtnMensagens = document.getElementById('nav-btn-mensagens');
 const navBtnAgenda = document.getElementById('nav-btn-agenda');
@@ -66,8 +75,10 @@ const UNIDADES_DISPONIVEIS = [
 // ================== NAVEGAÇÃO ENTRE TELAS ==================
 navBtnAgenda.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
+  telaRemarcacao.style.display = 'none';
   telaAgenda.style.display = 'block';
   navBtnMensagens.classList.remove('active');
+  navBtnRemarcacao.classList.remove('active');
   navBtnAgenda.classList.add('active');
   carregarEditorAgenda();
 });
@@ -75,8 +86,20 @@ navBtnAgenda.addEventListener('click', () => {
 navBtnMensagens.addEventListener('click', () => {
   telaPrincipal.style.display = 'block';
   telaAgenda.style.display = 'none';
+  telaRemarcacao.style.display = 'none';
   navBtnAgenda.classList.remove('active');
+  navBtnRemarcacao.classList.remove('active');
   navBtnMensagens.classList.add('active');
+});
+
+navBtnRemarcacao.addEventListener('click', () => {
+  telaPrincipal.style.display = 'none';
+  telaAgenda.style.display = 'none';
+  telaRemarcacao.style.display = 'block';
+  navBtnMensagens.classList.remove('active');
+  navBtnAgenda.classList.remove('active');
+  navBtnRemarcacao.classList.add('active');
+  carregarAgendasRemarcacao();
 });
 
 function getIconeAnexo(tipo) {
@@ -159,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
   carregarMensagens();
   campoBuscaAgenda.addEventListener('input', filtrarMedicosAgenda);
   inputImportarAgenda.addEventListener('change', importarDadosAgenda);
+  btnIniciarRemarcacao.addEventListener('click', iniciarRemarcacao);
   inicializarAgenda();
 });
 
@@ -391,6 +415,84 @@ btnSalvarAgenda.addEventListener('click', () => {
     navBtnMensagens.click(); // Volta para a tela de mensagens
   });
 });
+
+// ================== REMARCAÇÃO EM LOTE ==================
+function carregarAgendasRemarcacao() {
+  chrome.storage.local.get(['mapeamentoAgenda', 'ultimaRemarcacao'], (data) => {
+    const mapeamento = data.mapeamentoAgenda || {};
+    const ultimaRemarcacao = data.ultimaRemarcacao || {};
+
+    const medicosOrdenados = Object.entries(mapeamento).sort(([, a], [, b]) => {
+      return a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' });
+    });
+
+    remarcacaoAgendaOrigem.innerHTML = '<option value="">Selecione a origem</option>';
+    remarcacaoAgendaDestino.innerHTML = '<option value="">Selecione o destino</option>';
+
+    for (const [medicoId, medico] of medicosOrdenados) {
+      const option = document.createElement('option');
+      option.value = medicoId;
+      option.textContent = medico.nome;
+      remarcacaoAgendaOrigem.appendChild(option.cloneNode(true));
+      remarcacaoAgendaDestino.appendChild(option.cloneNode(true));
+    }
+
+    // Restaura os últimos valores usados
+    if (ultimaRemarcacao.sourceId) {
+      remarcacaoAgendaOrigem.value = ultimaRemarcacao.sourceId;
+    }
+    if (ultimaRemarcacao.destinationId) {
+      remarcacaoAgendaDestino.value = ultimaRemarcacao.destinationId;
+    }
+    if (ultimaRemarcacao.newDate) {
+      remarcacaoNovaData.value = ultimaRemarcacao.newDate;
+    }
+    if (ultimaRemarcacao.observationText) {
+      remarcacaoObservacao.value = ultimaRemarcacao.observationText;
+    } else {
+      remarcacaoObservacao.value = 'Remarcado do dia {data_original} para o dia {data_nova}.';
+    }
+  });
+}
+
+function iniciarRemarcacao() {
+  const sourceId = remarcacaoAgendaOrigem.value;
+  const destinationId = remarcacaoAgendaDestino.value;
+  const newDate = remarcacaoNovaData.value;
+  const observationText = remarcacaoObservacao.value;
+
+  if (!sourceId || !destinationId || !newDate) {
+    alert('Por favor, preencha todos os campos: agenda de origem, destino e a nova data.');
+    return;
+  }
+
+  if (sourceId === destinationId) {
+    alert('A agenda de origem e destino não podem ser a mesma.');
+    return;
+  }
+
+  // Salva os dados para persistência
+  chrome.storage.local.set({
+    ultimaRemarcacao: {
+      sourceId,
+      destinationId,
+      newDate,
+      observationText
+    }
+  });
+
+  if (!confirm(`Confirma a remarcação de TODOS os agendamentos da agenda "${remarcacaoAgendaOrigem.options[remarcacaoAgendaOrigem.selectedIndex].text}" para a agenda "${remarcacaoAgendaDestino.options[remarcacaoAgendaDestino.selectedIndex].text}" na data ${newDate.split('-').reverse().join('/')}? \n\nESTA AÇÃO NÃO PODE SER DESFEITA.`)) {
+    return;
+  }
+
+  chrome.runtime.sendMessage({
+    acao: 'iniciarRemarcacaoLote',
+    sourceAgendaId: sourceId,
+    destinationAgendaId: destinationId,
+    newDate: newDate,
+    observation: observationText
+  });
+}
 
 // ================== GERENCIAMENTO E EDIÇÃO DE PASTAS ==================
 btnCriarPasta.addEventListener('click', () => {
