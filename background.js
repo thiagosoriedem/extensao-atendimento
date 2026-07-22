@@ -145,12 +145,7 @@ chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
 
 function processarEInjetarTextoDoMenu(textoOriginal) {
   let textoFinal = textoOriginal;
-  let nomeAutomatico = null;
-  const elementoNome = document.querySelector('.name span') || document.querySelector('.name');
-  if (elementoNome) {
-    let nomeLimpo = (elementoNome.textContent || elementoNome.innerText || "").trim().split('\n')[0];
-    if (nomeLimpo.length > 0) nomeAutomatico = nomeLimpo;
-  }
+  const nomeAutomatico = null; // Funcionalidade de nome automático removida
 
   const mapaTags = [
     { tag: "{nome}", promptMsg: "Digite o NOME do paciente/responsável:", valorAuto: nomeAutomatico },

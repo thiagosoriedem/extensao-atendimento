@@ -17,6 +17,14 @@ if (!document.getElementById('ts-estilos-animacao')) {
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   `;
   document.head.appendChild(estilos);
 }
@@ -560,91 +568,4 @@ function colarTextoComoLegenda(textoFinal, termoParaRemover, atraso = 150) {
     }
     campoFinal.focus();
   }, atraso);
-}
-
-// ================== LÓGICA PARA PRÉ-VISUALIZAÇÃO NO NEORON ==================
-
-if (window.location.hostname === 'direct.neoron.io') {
-  let neoronTooltipTimer = null;
-  let neoronTooltipElement = null;
-  let lastHoveredItem = null;
-
-  const hideNeoronPreview = () => {
-    if (neoronTooltipTimer) {
-      clearTimeout(neoronTooltipTimer);
-      neoronTooltipTimer = null;
-    }
-    if (neoronTooltipElement) {
-      neoronTooltipElement.remove();
-      neoronTooltipElement = null;
-    }
-  };
-
-  const showNeoronPreview = (event) => {
-    lastHoveredItem = event.target.closest('span.nav-text');
-    if (!lastHoveredItem) return;
-
-    const chatMessageElement = lastHoveredItem.querySelector('p.queued-at > span[style="width: 100%;"]');
-    if (chatMessageElement) {
-      const messageText = chatMessageElement.textContent.trim();
-      if (messageText) {
-        createPreviewTooltip(event, messageText);
-      }
-    }
-  };
-
-  const createPreviewTooltip = (event, messageText) => {
-    hideNeoronPreview();
-
-    neoronTooltipTimer = setTimeout(() => {
-      neoronTooltipElement = document.createElement('div');
-      neoronTooltipElement.style.cssText = `
-        position: fixed;
-        background-color: #1e293b;
-        color: #f8fafc;
-        padding: 10px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        line-height: 1.5;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 1000000000;
-        max-width: 350px;
-        pointer-events: none;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-        white-space: pre-wrap;
-        left: ${event.clientX + 15}px;
-        top: ${event.clientY + 15}px;
-      `;
-      neoronTooltipElement.textContent = messageText;
-      document.body.appendChild(neoronTooltipElement);
-    }, 500); // Atraso de 500ms para exibir
-  }
-
-  document.body.addEventListener('mouseover', showNeoronPreview);
-  document.body.addEventListener('mouseout', hideNeoronPreview);
-
-  // Observador para MODIFICAR o tooltip padrão do Neoron em vez de criar um novo.
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      mutation.addedNodes.forEach(node => {
-        // Verifica se o nó adicionado é o tooltip de chamada do Neoron
-        if (node.nodeType === 1 && node.matches('.ant-tooltip.call-metadata-tooltip')) {
-          const tooltipInner = node.querySelector('.ant-tooltip-inner');
-          if (tooltipInner) {
-            // Extrai a "Última mensagem" do texto do tooltip
-            const fullText = tooltipInner.innerText;
-            const match = fullText.match(/Última mensagem:\s*(.*)/);
-            const message = match ? match[1].trim() : fullText.trim();
-
-            // Modifica o conteúdo do tooltip original para mostrar apenas a mensagem
-            tooltipInner.innerText = message;
-            tooltipInner.style.whiteSpace = 'pre-wrap'; // Garante a quebra de linha
-            tooltipInner.style.textAlign = 'left';
-          }
-        }
-      });
-    }
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
 }

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "TextSync Ultra",
+  "name": "Telefonia SOS",
   "version": "2.0",
   "permissions": [
     "storage",
@@ -20,7 +20,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://web.whatsapp.com/*", "https://direct.neoron.io/*", "https://app.chatseguro.net/*" ],
+      "matches": ["https://web.whatsapp.com/*", "https://app.chatseguro.net/*" ],
       "js": ["content.js"]
     },
     {
