@@ -215,6 +215,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function startMassReschedule(destinationAgendaId, newDate, observation) {
     isRescheduleCancelled = false; // Reseta a flag no início de cada processo
 
+    // Adiciona um clique de "aquecimento" no contêiner do calendário.
+    // Isso é uma tentativa de resolver o problema onde um clique manual é necessário
+    // para que a automação comece a funcionar, possivelmente inicializando
+    // os event listeners da página.
+    const calendarContainer = document.getElementById('calendar');
+    if (calendarContainer) {
+        calendarContainer.click();
+        await new Promise(r => setTimeout(r, 250)); // Pequena pausa após o clique.
+    }
+
     const appointmentSelector = 'div.fc-event-container > a.fc-time-grid-event';
     const initialAppointmentElements = document.querySelectorAll(appointmentSelector);
     if (initialAppointmentElements.length === 0) {
@@ -274,28 +284,40 @@ async function startMassReschedule(destinationAgendaId, newDate, observation) {
 
 async function processAppointment(element, destinationAgendaId, newDate, observation) {
     return new Promise(async (resolve) => {
-        // Com base na nova indicação do usuário, o clique será direcionado para a div 'fc-bg'.
-        // Este elemento é uma camada de fundo que cobre toda a área do agendamento,
-        // tornando-se um alvo de clique mais confiável. O seletor foi confirmado pelo usuário no console.
-        const clickTarget = element.querySelector('div.fc-content > div > div > div');
-        if (clickTarget) {
-            // O usuário confirmou que executar .click() duas vezes no console funciona.
-            // Isso simula dois cliques rápidos para garantir que o pop-up seja acionado.
-            clickTarget.click(); // Primeiro clique
-            await new Promise(r => setTimeout(r, 50)); // Pequena pausa entre os cliques
-            clickTarget.click(); // Segundo clique
-        } else {
-            console.warn('TextSync PRO: Alvo de clique específico ("div.fc-content > div > div > div") não encontrado. Usando o elemento principal.');
-            element.click();
-            await new Promise(r => setTimeout(r, 50));
-            element.click();
-        }
- 
+        // A pista do 'aria-describedby' que você descobriu foi crucial. Ela indica que uma
+        // biblioteca de popover (como a do Bootstrap) está em uso. As tentativas de simular
+        // cliques falharam porque a página não os reconhecia. A solução definitiva é injetar
+        // um script para chamar a função da biblioteca diretamente no contexto da página.
+        const tempId = `ts-temp-click-target-${Date.now()}`;
+        element.id = tempId; // Adiciona um ID temporário para o script encontrar o elemento.
+
+        // A injeção de script inline foi bloqueada pelo Content Security Policy (CSP) da página.
+        // A solução é delegar a execução do script para o background.js, que usa a API
+        // chrome.scripting.executeScript, contornando a restrição do CSP.
+        await new Promise(bgResolve => {
+            chrome.runtime.sendMessage({
+                acao: "executarCliquePopover",
+                elementId: tempId
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error("TextSync PRO: Erro ao comunicar com o background script:", chrome.runtime.lastError.message);
+                }
+                // A promessa é resolvida quando o background script responde, garantindo
+                // que o popover foi acionado antes de continuar.
+                bgResolve();
+            });
+        });
+
         // A versão anterior parou de funcionar por uma "race condition": a automação era mais rápida que a página para carregar o botão.
         // Esta versão corrigida espera diretamente pelo botão usando seu seletor mais estável ('data-original-title'), o que é mais confiável.
         // Mudança de estratégia: O atributo 'data-original-title' é carregado por um script de tooltip e pode demorar.
         // Vamos mirar no atributo 'onclick', que é mais estável e parte do HTML inicial do popover.
-        const rescheduleButton = await waitForElement('.popover.in span[onclick^="reagendar"]', 5000);
+        // A versão anterior falhava porque procurava o botão de reagendamento especificamente em uma tag 'span'.
+        // A correção torna o seletor mais genérico, procurando por qualquer elemento com o atributo 'onclick',
+        // o que é mais robusto. A busca por 'onclick' falhou, então a estratégia foi alterada
+        // para procurar pelo texto visível "Reagendar", que é menos propenso a falhas
+        // se a implementação do clique for alterada.
+        const rescheduleButton = await waitForElementWithText('.popover.in a, .popover.in button, .popover.in span', 'Reagendar', 5000);
 
         // Captura a data original do popover antes que ele seja fechado
         let originalDateText = '';
@@ -323,9 +345,11 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
 
         if (!rescheduleButton) {
             console.warn('TextSync PRO: Botão de reagendar não foi encontrado no popover. Pulando.');
-            // Try to close any open popover to avoid getting stuck
+            // Tenta fechar qualquer popover aberto para não travar o processo.
             const popover = document.querySelector('.popover.in');
             if (popover) {
+                // Adiciona um log do conteúdo do popover para facilitar a depuração futura.
+                console.log("TextSync PRO: Conteúdo do popover encontrado:", popover.innerHTML);
                 const closeBtn = popover.querySelector('.c-popover-click-icon--close');
                 if (closeBtn) {
                     closeBtn.click();
@@ -333,6 +357,8 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
                     // Fallback to just remove the element if no close button is found
                     popover.remove();
                 }
+            } else {
+                console.warn('TextSync PRO: O popover (.popover.in) também não foi encontrado, o que indica que ele não abriu.');
             }
             await new Promise(r => setTimeout(r, 200)); // Wait for popover to close
             resolve();

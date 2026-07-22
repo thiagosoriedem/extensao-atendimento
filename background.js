@@ -106,6 +106,41 @@ chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
     });
     return true; // Manter canal aberto para respostas assíncronas
   }
+
+  // Ouve o pedido do content-agenda.js para executar o clique que abre o popover.
+  // Isso é necessário para contornar o Content Security Policy (CSP) da página,
+  // que bloqueia a injeção de scripts inline a partir do content script.
+  if (requisicao.acao === 'executarCliquePopover' && sender.tab) {
+    chrome.scripting.executeScript({
+      target: { tabId: sender.tab.id },
+      world: 'MAIN', // Executa no contexto da página para ter acesso ao jQuery e aos event listeners.
+      func: (elementId) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+            const clickTarget = el.querySelector('div.fc-content > div > div > div') || el;
+            const jq = window.jQuery || window.$;
+            
+            // A forma mais confiável é chamar o método .popover('show') da biblioteca.
+            if (jq && typeof jq(clickTarget).popover === 'function') {
+                jq(clickTarget).popover('show');
+            } else {
+                // Fallback para simular cliques duplos se a função .popover não estiver disponível.
+                if (jq) {
+                    jq(clickTarget).trigger('click');
+                    setTimeout(() => jq(clickTarget).trigger('click'), 150);
+                } else {
+                    clickTarget.click();
+                    setTimeout(() => clickTarget.click(), 150);
+                }
+            }
+            el.removeAttribute('id'); // Limpa o ID temporário após o uso.
+        }
+      },
+      args: [requisicao.elementId]
+    }).then(() => enviarResposta({ status: "clique executado" }))
+      .catch(err => console.error("Falha ao executar script de clique:", err));
+    return true; // Manter canal aberto para resposta assíncrona.
+  }
 });
 
 function processarEInjetarTextoDoMenu(textoOriginal) {
