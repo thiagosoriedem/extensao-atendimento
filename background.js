@@ -148,6 +148,16 @@ function processarEInjetarTextoDoMenu(textoOriginal) {
   let textoFinal = textoOriginal;
   const nomeAutomatico = null; // Funcionalidade de nome automático removida
 
+  const horaAtual = new Date().getHours();
+  let saudacao = "";
+  if (horaAtual >= 5 && horaAtual < 12) {
+    saudacao = "Bom dia";
+  } else if (horaAtual >= 12 && horaAtual < 18) {
+    saudacao = "Boa tarde";
+  } else {
+    saudacao = "Boa noite";
+  }
+
   const mapaTags = [
     { tag: "{nome}", promptMsg: "Digite o NOME do paciente/responsável:", valorAuto: nomeAutomatico },
     { tag: "{convenio}", promptMsg: "Digite o CONVÊNIO:", valorAuto: null },
@@ -157,7 +167,8 @@ function processarEInjetarTextoDoMenu(textoOriginal) {
     { tag: "{valor}", promptMsg: "Digite o VALOR:", valorAuto: null },
     { tag: "{data}", promptMsg: "Digite a DATA:", valorAuto: null },
     { tag: "{hora}", promptMsg: "Digite o HORÁRIO:", valorAuto: null },
-    { tag: "{cpf}", promptMsg: "Digite o CPF:", valorAuto: null }
+    { tag: "{cpf}", promptMsg: "Digite o CPF:", valorAuto: null },
+    { tag: "{saudacao}", promptMsg: "", valorAuto: saudacao }
   ];
 
   for (const item of mapaTags) {

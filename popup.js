@@ -714,7 +714,7 @@ inputImportar.addEventListener('change', (evento) => {
 
         const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
 
-        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: atuaisPastas }, () => {
+        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: pastasFinais }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
@@ -1065,9 +1065,19 @@ btnCarregarPadrao.addEventListener('click', () => {
         });
 
         atuaisPastas.sort((a, b) => a.nome.localeCompare(b.nome));
+        
+        // Filtra mensagens que já existem (baseado em título e texto)
+        const existingMessageHashes = new Set(atuaisMensagens.map(msg => `${msg.titulo}|${msg.texto}`));
+        const novasMensagensUnicas = tratadas.filter(msg => {
+          const msgHash = `${msg.titulo}|${msg.texto}`;
+          if (existingMessageHashes.has(msgHash)) {
+            return false; // Ignora se já existe
+          }
+          return true;
+        });
 
         // Salva tudo de uma vez no banco local deste computador
-        const mensagensFinais = [...atuaisMensagens, ...tratadas];
+        const mensagensFinais = [...atuaisMensagens, ...novasMensagensUnicas];
         chrome.storage.local.set({ mensagens: mensagensFinais, pastas: atuaisPastas }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
