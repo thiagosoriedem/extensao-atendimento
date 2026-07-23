@@ -919,8 +919,10 @@ function filtrarEExibirMensagens(termo) {
         </div>
         <div class="tooltip-previa"><strong>${msg.titulo}</strong>\n\n${msg.texto}${msg.anexos && msg.anexos.length > 0 ? `\n\n📎 ${msg.anexos.length} anexo(s)` : ''}</div>
         <div class="acoes-item">
-          <button class="btn-acao editar"><span class="material-icons-round" style="font-size: 18px;">edit</span></button>
-          <button class="btn-acao deletar"><span class="material-icons-round" style="font-size: 18px;">delete_outline</span></button>
+          <button class="btn-acao copiar-texto" title="Copiar Texto"><span class="material-icons-round" style="font-size: 17px;">assignment</span></button>
+          <button class="btn-acao duplicar" title="Duplicar Mensagem"><span class="material-icons-round" style="font-size: 17px;">content_copy</span></button>
+          <button class="btn-acao editar" title="Editar Mensagem"><span class="material-icons-round" style="font-size: 17px;">edit</span></button>
+          <button class="btn-acao deletar" title="Excluir Mensagem"><span class="material-icons-round" style="font-size: 17px;">delete_outline</span></button>
         </div>
       `;
 
@@ -931,6 +933,16 @@ function filtrarEExibirMensagens(termo) {
         prepararEdicao(msg.id, msg.titulo, msg.atalho, msg.categoria, msg.texto, msg.anexos || []); 
       });
       
+      div.querySelector('.copiar-texto').addEventListener('click', (e) => {
+        e.stopPropagation();
+        copiarTextoParaClipboard(msg.texto, e.currentTarget);
+      });
+
+      div.querySelector('.duplicar').addEventListener('click', (e) => {
+        e.stopPropagation();
+        duplicarMensagem(msg.id);
+      });
+
       div.querySelector('.deletar').addEventListener('click', (e) => { 
         e.stopPropagation(); 
         deletarMensagem(msg.id); 
@@ -1012,6 +1024,48 @@ function resetarFormulario() {
   // Limpa os anexos temporários
   anexosTemporarios = []; 
   exibirListaAnexos();
+}
+
+function copiarTextoParaClipboard(texto, botao) {
+  navigator.clipboard.writeText(texto).then(() => {
+    const textoOriginal = botao.innerHTML;
+    botao.innerHTML = `<span style="font-size:11px; font-weight:bold; color:var(--success);">Copiado!</span>`;
+    botao.disabled = true;
+    setTimeout(() => {
+      botao.innerHTML = textoOriginal;
+      botao.disabled = false;
+    }, 1500);
+  }).catch(err => {
+    console.error('Falha ao copiar texto: ', err);
+    alert('Não foi possível copiar o texto.');
+  });
+}
+
+function duplicarMensagem(idOriginal) {
+  chrome.storage.local.get({ mensagens: [] }, (resultado) => {
+    let mensagens = resultado.mensagens;
+    const mensagemOriginal = mensagens.find(m => m.id === idOriginal);
+
+    if (!mensagemOriginal) {
+      return alert('Mensagem original não encontrada para duplicação.');
+    }
+
+    const novaMensagem = {
+      ...mensagemOriginal, // Copia todos os campos (texto, categoria, anexos, etc.)
+      id: "msg_" + Date.now(), // Cria um novo ID único
+      titulo: `Cópia de ${mensagemOriginal.titulo}`, // Adiciona "Cópia de" ao título
+      atalho: "" // Limpa o atalho para evitar conflitos
+    };
+
+    // Adiciona a nova mensagem logo após a original na lista
+    const indexOriginal = mensagens.findIndex(m => m.id === idOriginal);
+    mensagens.splice(indexOriginal + 1, 0, novaMensagem);
+
+    chrome.storage.local.set({ mensagens }, () => {
+      carregarMensagens();
+      chrome.runtime.sendMessage({ acao: "atualizar_menu" });
+    });
+  });
 }
 
 function deletarMensagem(id) {
