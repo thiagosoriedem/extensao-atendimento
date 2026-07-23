@@ -714,7 +714,17 @@ inputImportar.addEventListener('change', (evento) => {
 
         const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
 
-        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: pastasFinais }, () => {
+        // Filtra mensagens que já existem (baseado em título e texto) para evitar duplicatas
+        const existingMessageHashes = new Set(atuaisMensagens.map(msg => `${msg.titulo}|${msg.texto}`));
+        const novasMensagensUnicas = tratadas.filter(msg => {
+          const msgHash = `${msg.titulo}|${msg.texto}`;
+          if (existingMessageHashes.has(msgHash)) {
+            return false; // Ignora se já existe
+          }
+          return true;
+        });
+
+        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...novasMensagensUnicas], pastas: pastasFinais }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
