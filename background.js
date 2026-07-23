@@ -1,5 +1,7 @@
 // background.js
 
+let mensagensArmazenadas = [];
+
 function atualizarMenuContexto() {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
@@ -12,6 +14,7 @@ function atualizarMenuContexto() {
       mensagens: [], 
       pastas: ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"] 
     }, (resultado) => {
+      mensagensArmazenadas = resultado.mensagens || []; // Armazena as mensagens
       const menusCriados = new Set();
 
       resultado.pastas.forEach(caminho => {
@@ -55,16 +58,14 @@ chrome.runtime.onInstalled.addListener(atualizarMenuContexto);
 chrome.runtime.onStartup.addListener(atualizarMenuContexto);
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  chrome.storage.local.get({ mensagens: [] }, (resultado) => {
-    const mensagemClicada = resultado.mensagens.find(msg => msg.id === info.menuItemId);
-    if (mensagemClicada && tab.id) {
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: processarEInjetarTextoDoMenu,
-        args: [mensagemClicada.texto]
-      });
-    }
-  });
+  const mensagemClicada = mensagensArmazenadas.find(msg => msg.id === info.menuItemId);
+  if (mensagemClicada && tab.id) {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: processarEInjetarTextoDoMenu,
+      args: [mensagemClicada.texto]
+    });
+  }
 });
 
 chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
