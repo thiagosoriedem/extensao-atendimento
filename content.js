@@ -2,6 +2,7 @@
 let menuFlutuante = null;
 let campoAtivo = null;
 let mensagensLocais = [];
+let mapeamentoAgendaLocal = {};
 let termoPesquisaAtual = "";
 
 // Variáveis para controle do Tooltip
@@ -21,6 +22,21 @@ if (!document.getElementById('ts-estilos-animacao')) {
   document.head.appendChild(estilos);
 }
 
+// Lista de unidades disponíveis para a Smart Tag {{unidades}}
+const UNIDADES_DISPONIVEIS = [
+    "SOS OTORRINO ALTIPLANO",
+    "SOS OTORRINO BESSA",
+    "SOS OTORRINO CAMPINA GRANDE",
+    "SOS OTORRINO MANAIRA",
+    "SOS OTORRINO MANGABEIRA",
+    "SOS OTORRINO TAMBAU 24 HRS",
+    "SOS OTORRINO TAMBAÚ DIA",
+    "SOS OTORRINO TELEMEDICINA",
+    "SOS OTORRINO TORRE",
+    "SOS OTORRINO VALENTINA",
+    "CAMPINA GRANDE - DESIGN MALL"
+].sort();
+
 // Carrega as mensagens salvas na extensão
 function carregarMensagensEAtalhos() {
   chrome.storage.local.get({ mensagens: [] }, (resultado) => {
@@ -29,10 +45,21 @@ function carregarMensagensEAtalhos() {
 }
 carregarMensagensEAtalhos();
 
+// Carrega o mapeamento da agenda para a Smart Tag {{medicos}}
+function carregarMapeamentoAgenda() {
+    chrome.storage.local.get({ mapeamentoAgenda: {} }, (resultado) => {
+        mapeamentoAgendaLocal = resultado.mapeamentoAgenda;
+    });
+}
+carregarMapeamentoAgenda();
+
 // Monitora alterações no storage em tempo real
 chrome.storage.onChanged.addListener((alteracoes) => {
   if (alteracoes.mensagens) {
     mensagensLocais = alteracoes.mensagens.newValue || [];
+  }
+  if (alteracoes.mapeamentoAgenda) {
+    mapeamentoAgendaLocal = alteracoes.mapeamentoAgenda.newValue || {};
   }
 });
 
@@ -73,19 +100,80 @@ document.addEventListener('keydown', (evento) => {
   }
 });
 
+function getWordAtCursor(element) {
+    let text = '';
+    let cursorPosition = 0;
+
+    if (element.isContentEditable) {
+        const selection = window.getSelection();
+        if (selection.rangeCount === 0) return '';
+        const range = selection.getRangeAt(0);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        text = preCaretRange.toString();
+        cursorPosition = text.length;
+    } else if (typeof element.value === 'string') {
+        text = element.value;
+        cursorPosition = element.selectionStart;
+    } else {
+        return '';
+    }
+
+    const textBeforeCursor = text.substring(0, cursorPosition);
+    const lastSpace = textBeforeCursor.lastIndexOf(' ');
+    const lastNewline = textBeforeCursor.lastIndexOf('\n');
+    const lastBreak = Math.max(lastSpace, lastNewline);
+    return textBeforeCursor.substring(lastBreak + 1);
+}
+
 document.addEventListener('input', (evento) => {
   const campo = evento.target;
-  if (!campo || campo.value === undefined || campo.classList.contains('ts-filtro-busca')) return;
+  if (!campo || !(campo.isContentEditable || typeof campo.value === 'string') || campo.classList.contains('ts-filtro-busca')) return;
 
   const texto = campo.value;
+  const cursor = campo.selectionStart;
+  campoAtivo = campo;
 
-  if (texto.endsWith('--')) {
-    campoAtivo = campo;
+  // Prioridade 1: Menu de busca completa com '--'
+  if (texto.substring(0, cursor).endsWith('--')) {
     termoPesquisaAtual = "";
     abrirMenuMensagens(campo);
-  } else if (menuFlutuante && !texto.includes('--')) {
-    removerMenu();
+    return;
   }
+
+  // Prioridade 2: Sugestões contextuais enquanto digita
+  const currentWord = getWordAtCursor(campo);
+
+  // Não acionar para palavras muito curtas ou se o menu já for de busca geral
+  if (currentWord.length < 3 || (menuFlutuante && menuFlutuante.dataset.type === 'messages')) {
+      removerMenu();
+      return;
+  }
+
+  const searchTerm = currentWord.toLowerCase();
+
+  const medicosEncontrados = Object.values(mapeamentoAgendaLocal)
+      .map(m => m.nome)
+      .filter(nome => nome.toLowerCase().includes(searchTerm));
+
+  const unidadesEncontradas = UNIDADES_DISPONIVEIS
+      .filter(unidade => unidade.toLowerCase().includes(searchTerm));
+
+  const mensagensEncontradas = mensagensLocais
+      .filter(msg => msg.titulo.toLowerCase().includes(searchTerm));
+
+  if (medicosEncontrados.length === 0 && unidadesEncontradas.length === 0 && mensagensEncontradas.length === 0) {
+      removerMenu();
+      return;
+  }
+
+  // Se chegamos aqui, temos sugestões. Abrir o menu unificado.
+  openUnifiedSuggestionMenu(campo, {
+      medicos: medicosEncontrados,
+      unidades: unidadesEncontradas,
+      mensagens: mensagensEncontradas
+  }, currentWord);
 });
 
 function abrirMenuMensagens(campo) {
@@ -94,6 +182,7 @@ function abrirMenuMensagens(campo) {
 
   menuFlutuante = document.createElement('div');
   menuFlutuante.id = 'ts-menu-sugestoes';
+  menuFlutuante.dataset.type = 'messages'; // Adiciona um tipo para o menu
   
   Object.assign(menuFlutuante.style, {
     position: 'fixed',
@@ -390,6 +479,161 @@ function fecharMenuCliqueFora(e) {
   }
 }
 
+function openUnifiedSuggestionMenu(campo, suggestions, wordToReplace) {
+    removerMenu();
+
+    menuFlutuante = document.createElement('div');
+    menuFlutuante.id = 'ts-menu-sugestoes';
+    menuFlutuante.dataset.type = 'contextual';
+
+    Object.assign(menuFlutuante.style, {
+      position: 'fixed', backgroundColor: '#ffffff', border: '1px solid #cbd5e1',
+      borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.15)',
+      zIndex: '99999999', width: '320px', maxHeight: '300px', display: 'flex',
+      flexDirection: 'column', overflow: 'hidden', padding: '4px',
+      fontFamily: 'Segoe UI, system-ui, sans-serif', fontSize: '13px'
+    });
+
+    const retangulo = campo.getBoundingClientRect();
+    let topo = retangulo.bottom + window.scrollY + 6;
+    let esquerda = retangulo.left + window.scrollX;
+    if (topo + 300 > window.innerHeight) {
+      topo = retangulo.top + window.scrollY - 306;
+    }
+    menuFlutuante.style.top = `${topo}px`;
+    menuFlutuante.style.left = `${esquerda}px`;
+
+    const areaLista = document.createElement('div');
+    areaLista.className = 'ts-area-lista-mensagens';
+    Object.assign(areaLista.style, { overflowY: 'auto', flex: '1', padding: '4px' });
+    menuFlutuante.appendChild(areaLista);
+
+    const addSection = (title, items, type) => {
+        if (!items || items.length === 0) return;
+
+        const header = document.createElement('div');
+        header.textContent = title;
+        Object.assign(header.style, {
+            padding: '6px 8px 3px 8px', fontSize: '10px', fontWeight: '700',
+            color: '#64748b', textTransform: 'uppercase',
+            borderTop: areaLista.children.length > 0 ? '1px solid #f1f5f9' : 'none',
+            marginTop: areaLista.children.length > 0 ? '4px' : '0',
+        });
+        areaLista.appendChild(header);
+
+        items.slice(0, 5).forEach(itemData => { // Limita a 5 sugestões por categoria
+            const itemEl = document.createElement('div');
+            itemEl.className = 'ts-menu-item';
+            const text = (type === 'mensagens') ? itemData.titulo : itemData;
+
+            let icon = '';
+            switch (type) {
+                case 'mensagens': icon = '💬'; break;
+                case 'medicos':   icon = '🧑‍⚕️'; break; // Emoji de profissional de saúde
+                case 'unidades':  icon = '🏢'; break; // Emoji de prédio
+            }
+
+            // Adiciona o ícone antes do texto
+            itemEl.innerHTML = `<span style="margin-right: 8px; font-size: 14px; line-height: 1;">${icon}</span><span>${text}</span>`;
+
+            Object.assign(itemEl.style, {
+              padding: '7px 10px', borderRadius: '6px', cursor: 'pointer',
+              transition: 'background-color 0.15s', fontWeight: '500', color: '#1e293b',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              display: 'flex',
+              alignItems: 'center'
+            });
+
+            itemEl.addEventListener('mouseenter', (e) => {
+                itemEl.style.backgroundColor = '#f1f5f9';
+                if (type === 'mensagens') {
+                    // Inicia um timer para exibir a prévia do texto da mensagem
+                    timerTooltip = setTimeout(() => {
+                        exibirTooltipPrevia(e, itemData.texto);
+                    }, 800); // Atraso de 800ms para exibir a prévia
+                }
+            });
+
+            itemEl.addEventListener('mouseleave', () => {
+                itemEl.style.backgroundColor = 'transparent';
+                // Cancela o timer e remove a prévia se ela estiver visível
+                removerTooltip();
+            });
+
+            itemEl.addEventListener('click', () => {
+                // Garante que a prévia seja removida ao clicar no item
+                removerTooltip();
+
+                if (type === 'mensagens') {
+                    inserirMensagemSelecionada(itemData, wordToReplace);
+                } else {
+                    inserirValorSimples(itemData, wordToReplace);
+                }
+            });
+            areaLista.appendChild(itemEl);
+        });
+    };
+
+    // A ordem define a prioridade na lista
+    addSection('Mensagens', suggestions.mensagens, 'mensagens');
+    addSection('Médicos', suggestions.medicos, 'medicos');
+    addSection('Unidades', suggestions.unidades, 'unidades');
+
+    if (areaLista.children.length === 0) {
+        removerMenu();
+        return;
+    }
+
+    document.body.appendChild(menuFlutuante);
+    document.addEventListener('click', fecharMenuCliqueFora);
+}
+
+/**
+ * Insere um valor de texto simples (como nome de médico ou unidade), substituindo a palavra que está sendo digitada.
+ * @param {string} valor - O texto a ser inserido.
+ * @param {string} termoParaRemover - A palavra que está sendo digitada e que será substituída.
+ */
+function inserirValorSimples(valor, termoParaRemover) {
+    if (!campoAtivo) return;
+    const textToInsert = valor + ' '; // Adiciona um espaço para facilitar a continuação da digitação
+
+    if (campoAtivo.isContentEditable) {
+        campoAtivo.focus();
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.collapse(false); // Garante que estamos no cursor, não numa seleção
+
+            // Tenta selecionar a palavra para trás e substituí-la
+            if (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset >= termoParaRemover.length) {
+                range.setStart(range.startContainer, range.startOffset - termoParaRemover.length);
+            }
+            // Substitui a seleção (ou insere no cursor se a seleção falhar)
+            document.execCommand('insertText', false, textToInsert);
+        }
+    } else if (typeof campoAtivo.value === 'string') {
+        const valorAtual = campoAtivo.value;
+        const posCursor = campoAtivo.selectionStart;
+        const textoAntesCursor = valorAtual.substring(0, posCursor);
+
+        const posTermo = textoAntesCursor.lastIndexOf(termoParaRemover);
+        if (posTermo !== -1) {
+            const inicio = textoAntesCursor.substring(0, posTermo);
+            const fim = valorAtual.substring(posCursor);
+            campoAtivo.value = inicio + textToInsert + fim;
+
+            // Posiciona o cursor após o texto inserido e o espaço
+            const novaPosCursor = (inicio + textToInsert).length;
+            campoAtivo.selectionStart = novaPosCursor;
+            campoAtivo.selectionEnd = novaPosCursor;
+        }
+    }
+    // Dispara o evento input para que frameworks (React, etc.) reconheçam a mudança
+    campoAtivo.dispatchEvent(new Event('input', { bubbles: true }));
+    removerMenu();
+    campoAtivo.focus();
+}
+
 /**
  * Converte uma string Base64 para um objeto File.
  * @param {string} base64 - A string de dados em Base64 (ex: "data:image/png;base64,iVBORw...").
@@ -518,13 +762,28 @@ async function inserirMensagemSelecionada(msg, termoParaRemover) {
     }
   }
 
-  // Remove o termo do atalho (--atalho) do campo de texto
-  if (campoAtivo.value !== undefined) {
-    let valorCompleto = campoAtivo.value;
-    if (termoParaRemover && valorCompleto.includes(termoParaRemover)) {
-      const posicaoGatilho = valorCompleto.lastIndexOf(termoParaRemover);
-      campoAtivo.value = valorCompleto.substring(0, posicaoGatilho);
-      campoAtivo.dispatchEvent(new Event('input', { bubbles: true }));
+  // Remove o termo do atalho (--atalho) ou a palavra-gatilho do campo de texto
+  if (termoParaRemover) {
+    if (campoAtivo.isContentEditable) {
+        campoAtivo.focus();
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.collapse(false);
+            if (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset >= termoParaRemover.length) {
+                range.setStart(range.startContainer, range.startOffset - termoParaRemover.length);
+                range.deleteContents();
+            }
+        }
+    } else if (typeof campoAtivo.value === 'string') {
+        const valorAtual = campoAtivo.value;
+        const posCursor = campoAtivo.selectionStart;
+        const textoAntesCursor = valorAtual.substring(0, posCursor);
+        const posicaoGatilho = textoAntesCursor.lastIndexOf(termoParaRemover);
+        if (posicaoGatilho !== -1) {
+            campoAtivo.value = textoAntesCursor.substring(0, posicaoGatilho) + valorAtual.substring(posCursor);
+            campoAtivo.selectionStart = campoAtivo.selectionEnd = posicaoGatilho;
+        }
     }
   }
   removerMenu();
@@ -550,27 +809,34 @@ async function inserirMensagemSelecionada(msg, termoParaRemover) {
       }
     }
     // Continua para colar o texto como legenda após um breve atraso.
-    colarTextoComoLegenda(textoFinal);
+    colarTextoComoLegenda(textoFinal, 150);
   } else {
     // Se não houver anexos, cola o texto imediatamente.
-    colarTextoComoLegenda(textoFinal, 0);
+    colarTextoComoLegenda(textoFinal, 50);
   }
 }
 
-function colarTextoComoLegenda(textoFinal, termoParaRemover, atraso = 150) {
+function colarTextoComoLegenda(textoFinal, atraso = 150) {
   setTimeout(() => {
     // Re-seleciona o campo ativo, que pode ter mudado para o campo de legenda do anexo.
-    const campoAtual = document.activeElement;
-    const campoFinal = (campoAtual && (campoAtual.value !== undefined || campoAtual.isContentEditable)) ? campoAtual : campoAtivo;
+    let campoFinal = document.activeElement;
+    if (!campoFinal || !(campoFinal.isContentEditable || typeof campoFinal.value === 'string')) {
+        campoFinal = campoAtivo; // Fallback para o campo original
+    }
+    campoFinal.focus();
     
-    if (campoFinal.value !== undefined) {
-      campoFinal.value += textoFinal;
+    if (campoFinal.isContentEditable) {
+        document.execCommand('insertText', false, textoFinal);
+    } else if (typeof campoFinal.value === 'string') {
+      const start = campoFinal.selectionStart || 0;
+      const end = campoFinal.selectionEnd || 0;
+      campoFinal.value = campoFinal.value.substring(0, start) + textoFinal + campoFinal.value.substring(end);
+      const newCursorPos = start + textoFinal.length;
+      campoFinal.selectionStart = campoFinal.selectionEnd = newCursorPos;
       
       // Dispara eventos para que o React do WhatsApp reconheça a mudança
       campoFinal.dispatchEvent(new Event('input', { bubbles: true }));
-      campoFinal.dispatchEvent(new Event('change', { bubbles: true }));
     }
-    campoFinal.focus();
   }, atraso);
 }
 
