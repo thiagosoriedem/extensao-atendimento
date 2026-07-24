@@ -2,13 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Telefonia SOS</title>
+  <title>TextSync Ultra</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   
   <style>
     :root {
-      --primary: #dc2626; /* Vermelho principal */
-      --primary-hover: #b91c1c; /* Vermelho mais escuro para hover */
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
       --success: #16a34a;
       --success-hover: #15803d;
       --danger: #dc2626;
@@ -20,6 +20,8 @@
       --text: #1e293b;
       --text-secondary: #64748b;
       --border: #e2e8f0;
+      --stats-most-used-bg: #f0fdf4;
+      --stats-least-used-bg: #fffbeb;
     }
 
     /* Layout Principal */
@@ -44,13 +46,13 @@
       flex-shrink: 0;
     }
     .sidebar-header { text-align: center; margin-bottom: 20px; }
-    .sidebar-header h2 { margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--primary); }
+    .sidebar-header h2 { margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .sidebar-header h2 .material-icons-round { color: var(--primary); }
     
     .nav-links { display: flex; flex-direction: column; gap: 6px; }
     .nav-link { background: none; border: none; border-radius: 8px; padding: 10px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; text-align: left; }
     .nav-link:hover { background-color: var(--background); color: var(--text); }
-    .nav-link.active { background-color: #fee2e2; color: var(--primary); }
+    .nav-link.active { background-color: #eff6ff; color: var(--primary); }
     .nav-link .material-icons-round { font-size: 20px; }
 
     .sidebar-footer { margin-top: auto; }
@@ -112,7 +114,7 @@
     .item-mensagem { background: var(--surface); padding: 10px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; position: relative; user-select: none; }
     .item-mensagem:active { cursor: grabbing; }
     .item-mensagem.arrastando { opacity: 0.4; background-color: var(--background); border-style: dashed; }
-    .item-mensagem.drag-over { border-top: 3px solid var(--primary); background-color: #fee2e2; }
+    .item-mensagem.drag-over { border-top: 3px solid var(--primary); background-color: #eff6ff; }
 
     .item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; pointer-events: none; }
     .item-titulo { font-weight: 600; font-size: 12px; color: var(--text); }
@@ -152,12 +154,26 @@
     .anexo-tamanho { font-size: 10px; color: var(--text-secondary); white-space: nowrap; }
     .btn-remover-anexo { background: none; border: none; color: var(--danger); cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center; flex-shrink: 0; }
     .btn-remover-anexo:hover { background-color: #fee2e2; }
+
+    /* Estilos da Tela de Estatísticas */
+    .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .stats-card { background-color: var(--surface); border-radius: 12px; padding: 14px; border: 1px solid var(--border); }
+    .stats-card h3 { margin: 0 0 10px 0; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+    .stats-list { list-style: none; padding: 0; margin: 0; }
+    .stats-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 8px; border-radius: 6px; margin-bottom: 4px; }
+    .stats-item-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stats-item-count { font-weight: 700; font-size: 13px; padding: 2px 8px; border-radius: 10px; }
+    
+    .stats-item.most-used { background-color: var(--stats-most-used-bg); }
+    .stats-item.most-used .stats-item-count { background-color: var(--success); color: white; }
+    .stats-item.least-used { background-color: var(--stats-least-used-bg); }
+    .stats-item.least-used .stats-item-count { background-color: var(--warning); color: white; }
   </style>
 </head>
 <body>
   <nav class="sidebar">
     <div class="sidebar-header">
-      <h2><span class="material-icons-round">support_agent</span><span>Telefonia SOS</span></h2>
+      <h2><span class="material-icons-round">bolt</span><span>TextSync PRO</span></h2>
     </div>
     <div class="nav-links">
       <button id="nav-btn-mensagens" class="nav-link active">
@@ -171,6 +187,10 @@
       <button id="nav-btn-remarcacao" class="nav-link">
         <span class="material-icons-round">swap_horiz</span>
         <span>Remarcação</span>
+      </button>
+      <button id="nav-btn-estatisticas" class="nav-link">
+        <span class="material-icons-round">bar_chart</span>
+        <span>Estatísticas</span>
       </button>
     </div>
     <div class="sidebar-footer">
@@ -244,7 +264,7 @@
       <div id="listaMensagens" class="lista-mensagens"></div>
 
       <div class="backup-container">
-        <button id="btnCarregarPadrao" class="btn-backup" style="background-color: #fee2e2; border-color: #fecaca; color: var(--primary);" title="Carrega o arquivo backup_padrao.json da raiz">
+        <button id="btnCarregarPadrao" class="btn-backup" style="background-color: #eff6ff; border-color: #bfdbfe; color: var(--primary);" title="Carrega o arquivo backup_padrao.json da raiz">
           <span class="material-icons-round" style="font-size:16px;">autorenew</span> Restaurar Padrão
         </button>
         <button id="btnExportar" class="btn-backup"><span class="material-icons-round" style="font-size:16px;">cloud_download</span> Exportar</button>
@@ -306,6 +326,22 @@
       </div>
     </div>
   </main>
+
+  <div id="tela-estatisticas" class="main-content" style="display: none;">
+    <div class="header">
+      <h2><span class="material-icons-round" style="color: var(--primary);">bar_chart</span><span>Estatísticas de Uso</span></h2>
+    </div>
+    <div class="stats-container">
+      <div class="stats-card">
+        <h3><span class="material-icons-round" style="color: var(--success);">trending_up</span> Top 5 Mais Utilizadas</h3>
+        <ul id="lista-mais-usadas" class="stats-list"></ul>
+      </div>
+      <div class="stats-card">
+        <h3><span class="material-icons-round" style="color: var(--warning);">trending_down</span> Top 5 Menos Utilizadas</h3>
+        <ul id="lista-menos-usadas" class="stats-list"></ul>
+      </div>
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 </body>

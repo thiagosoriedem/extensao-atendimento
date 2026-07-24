@@ -49,9 +49,15 @@ const btnIniciarRemarcacao = document.getElementById('btnIniciarRemarcacao');
 // Elementos de Navegação
 const navBtnMensagens = document.getElementById('nav-btn-mensagens');
 const navBtnAgenda = document.getElementById('nav-btn-agenda');
+const navBtnEstatisticas = document.getElementById('nav-btn-estatisticas');
+
+// Elementos de Estatísticas
+const telaEstatisticas = document.getElementById('tela-estatisticas');
+const listaMaisUsadas = document.getElementById('lista-mais-usadas');
+const listaMenosUsadas = document.getElementById('lista-menos-usadas');
 
 let idMensagemEmEdicao = null;
-let pastaEmEdicaoNome = null; // Controla se estamos renomeando uma pasta
+let pastaEmEdicaoNome = null;
 let todasAsMensagens = [];
 let itemArrastado = null;
 let todasAsPastas = []; // Armazena as pastas com suas cores
@@ -76,9 +82,11 @@ const UNIDADES_DISPONIVEIS = [
 navBtnAgenda.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
   telaRemarcacao.style.display = 'none';
+  telaEstatisticas.style.display = 'none';
   telaAgenda.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
+  navBtnEstatisticas.classList.remove('active');
   navBtnAgenda.classList.add('active');
   carregarEditorAgenda();
 });
@@ -87,19 +95,35 @@ navBtnMensagens.addEventListener('click', () => {
   telaPrincipal.style.display = 'block';
   telaAgenda.style.display = 'none';
   telaRemarcacao.style.display = 'none';
+  telaEstatisticas.style.display = 'none';
   navBtnAgenda.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
+  navBtnEstatisticas.classList.remove('active');
   navBtnMensagens.classList.add('active');
 });
 
 navBtnRemarcacao.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
   telaAgenda.style.display = 'none';
+  telaEstatisticas.style.display = 'none';
   telaRemarcacao.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnAgenda.classList.remove('active');
+  navBtnEstatisticas.classList.remove('active');
   navBtnRemarcacao.classList.add('active');
   carregarAgendasRemarcacao();
+});
+
+navBtnEstatisticas.addEventListener('click', () => {
+  telaPrincipal.style.display = 'none';
+  telaAgenda.style.display = 'none';
+  telaRemarcacao.style.display = 'none';
+  telaEstatisticas.style.display = 'block';
+  navBtnMensagens.classList.remove('active');
+  navBtnAgenda.classList.remove('active');
+  navBtnRemarcacao.classList.remove('active');
+  navBtnEstatisticas.classList.add('active');
+  carregarEstatisticas();
 });
 
 function getIconeAnexo(tipo) {
@@ -695,18 +719,23 @@ inputImportar.addEventListener('change', (evento) => {
         const tratadas = mensagensImportar.map((msg, index) => ({
           id: "msg_" + Date.now() + "_" + index + "_" + Math.floor(Math.random() * 1000),
           titulo: msg.titulo || "Sem Título",
-          atalho: (msg.atalho || "").replace('--', '').trim().toLowerCase(),
+          atalho: (msg.atalho || "").replace('--', '').trim().toLowerCase(), // Limpa o atalho
           categoria: msg.categoria || "Outros",
-          texto: msg.texto || ""
+          texto: msg.texto || "",
+          anexos: msg.anexos || [],
+          useCount: msg.useCount || 0 // Garante que o contador exista
         }));
 
         tratadas.forEach(msg => {
           if (msg.categoria && !mapaPastasAtuais.has(msg.categoria)) {
-            mapaPastasAtuais.set(msg.categoria, { nome: msg.categoria, cor: null });
+            mapaPastasAtuais.set(msg.categoria, {
+              nome: msg.categoria,
+              cor: null
+            });
           }
         });
 
-        pastasImportar.forEach(p => {
+        pastasImportar.forEach(p => { // Adiciona pastas do arquivo de backup que não existem
           if (p.nome && !mapaPastasAtuais.has(p.nome)) {
             mapaPastasAtuais.set(p.nome, p);
           }
@@ -714,17 +743,7 @@ inputImportar.addEventListener('change', (evento) => {
 
         const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
 
-        // Filtra mensagens que já existem (baseado em título e texto) para evitar duplicatas
-        const existingMessageHashes = new Set(atuaisMensagens.map(msg => `${msg.titulo}|${msg.texto}`));
-        const novasMensagensUnicas = tratadas.filter(msg => {
-          const msgHash = `${msg.titulo}|${msg.texto}`;
-          if (existingMessageHashes.has(msgHash)) {
-            return false; // Ignora se já existe
-          }
-          return true;
-        });
-
-        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...novasMensagensUnicas], pastas: pastasFinais }, () => {
+        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: pastasFinais }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
@@ -755,20 +774,24 @@ btnSalvar.addEventListener('click', () => {
       return alert('Este código de atalho já está sendo usado em outra mensagem!');
     }
     
-    const novaMensagem = { 
-      id: idMensagemEmEdicao || "msg_" + Date.now(), 
-      titulo, 
-      atalho, 
-      categoria, 
-      texto,
-      // Garante que o array de anexos seja salvo
-      anexos: anexosTemporarios 
-    };
-
     if (idMensagemEmEdicao) {
-      mensagens = mensagens.map(msg => msg.id === idMensagemEmEdicao ? novaMensagem : msg);
+      // Modo Edição: preserva o useCount existente
+      const mensagemAntiga = mensagens.find(m => m.id === idMensagemEmEdicao);
+      const mensagemAtualizada = {
+        id: idMensagemEmEdicao, titulo, atalho, categoria, texto,
+        anexos: anexosTemporarios,
+        useCount: mensagemAntiga?.useCount || 0 // Preserva o contador
+      };
+      mensagens = mensagens.map(msg => msg.id === idMensagemEmEdicao ? mensagemAtualizada : msg);
     } else {
-      mensagens.push(novaMensagem);
+      // Modo Criação: inicializa o useCount com 0
+      const novaMensagem = {
+        id: "msg_" + Date.now(), titulo, atalho, categoria, texto,
+        anexos: anexosTemporarios,
+        useCount: 0 // Inicializa o contador
+      };
+      // Adiciona no início da lista para melhor visibilidade
+      mensagens.unshift(novaMensagem);
     }
 
     chrome.storage.local.set({ mensagens }, () => {
@@ -780,6 +803,43 @@ btnSalvar.addEventListener('click', () => {
 });
 
 btnCancelar.addEventListener('click', resetarFormulario);
+
+// ================== ESTATÍSTICAS ==================
+
+function carregarEstatisticas() {
+  chrome.storage.local.get({ mensagens: [] }, (resultado) => {
+    const mensagens = resultado.mensagens || [];
+
+    // Ordena por mais usadas (maior useCount primeiro)
+    const maisUsadas = [...mensagens].sort((a, b) => (b.useCount || 0) - (a.useCount || 0));
+    
+    // Ordena por menos usadas (menor useCount primeiro, mas apenas as que já foram usadas)
+    const menosUsadas = [...mensagens].filter(m => (m.useCount || 0) > 0).sort((a, b) => (a.useCount || 0) - (b.useCount || 0));
+
+    renderizarListaStats(listaMaisUsadas, maisUsadas.slice(0, 5), 'most-used');
+    renderizarListaStats(listaMenosUsadas, menosUsadas.slice(0, 5), 'least-used');
+  });
+}
+
+function renderizarListaStats(ulElement, lista, classe) {
+  ulElement.innerHTML = '';
+  if (lista.length === 0) {
+    ulElement.innerHTML = `<li style="font-size: 11px; color: var(--text-secondary); text-align: center;">Nenhum dado para exibir.</li>`;
+    return;
+  }
+
+  lista.forEach(msg => {
+    const li = document.createElement('li');
+    li.className = `stats-item ${classe}`;
+    li.innerHTML = `
+      <span class="stats-item-title" title="${msg.titulo}">${msg.titulo}</span>
+      <span class="stats-item-count" title="${msg.useCount || 0} usos">${msg.useCount || 0}</span>
+    `;
+    ulElement.appendChild(li);
+  });
+}
+
+
 
 function carregarMensagens() {
   chrome.storage.local.get({ mensagens: [] }, (resultado) => {
@@ -919,10 +979,8 @@ function filtrarEExibirMensagens(termo) {
         </div>
         <div class="tooltip-previa"><strong>${msg.titulo}</strong>\n\n${msg.texto}${msg.anexos && msg.anexos.length > 0 ? `\n\n📎 ${msg.anexos.length} anexo(s)` : ''}</div>
         <div class="acoes-item">
-          <button class="btn-acao copiar-texto" title="Copiar Texto"><span class="material-icons-round" style="font-size: 17px;">assignment</span></button>
-          <button class="btn-acao duplicar" title="Duplicar Mensagem"><span class="material-icons-round" style="font-size: 17px;">content_copy</span></button>
-          <button class="btn-acao editar" title="Editar Mensagem"><span class="material-icons-round" style="font-size: 17px;">edit</span></button>
-          <button class="btn-acao deletar" title="Excluir Mensagem"><span class="material-icons-round" style="font-size: 17px;">delete_outline</span></button>
+          <button class="btn-acao editar"><span class="material-icons-round" style="font-size: 18px;">edit</span></button>
+          <button class="btn-acao deletar"><span class="material-icons-round" style="font-size: 18px;">delete_outline</span></button>
         </div>
       `;
 
@@ -933,16 +991,6 @@ function filtrarEExibirMensagens(termo) {
         prepararEdicao(msg.id, msg.titulo, msg.atalho, msg.categoria, msg.texto, msg.anexos || []); 
       });
       
-      div.querySelector('.copiar-texto').addEventListener('click', (e) => {
-        e.stopPropagation();
-        copiarTextoParaClipboard(msg.texto, e.currentTarget);
-      });
-
-      div.querySelector('.duplicar').addEventListener('click', (e) => {
-        e.stopPropagation();
-        duplicarMensagem(msg.id);
-      });
-
       div.querySelector('.deletar').addEventListener('click', (e) => { 
         e.stopPropagation(); 
         deletarMensagem(msg.id); 
@@ -1026,48 +1074,6 @@ function resetarFormulario() {
   exibirListaAnexos();
 }
 
-function copiarTextoParaClipboard(texto, botao) {
-  navigator.clipboard.writeText(texto).then(() => {
-    const textoOriginal = botao.innerHTML;
-    botao.innerHTML = `<span style="font-size:11px; font-weight:bold; color:var(--success);">Copiado!</span>`;
-    botao.disabled = true;
-    setTimeout(() => {
-      botao.innerHTML = textoOriginal;
-      botao.disabled = false;
-    }, 1500);
-  }).catch(err => {
-    console.error('Falha ao copiar texto: ', err);
-    alert('Não foi possível copiar o texto.');
-  });
-}
-
-function duplicarMensagem(idOriginal) {
-  chrome.storage.local.get({ mensagens: [] }, (resultado) => {
-    let mensagens = resultado.mensagens;
-    const mensagemOriginal = mensagens.find(m => m.id === idOriginal);
-
-    if (!mensagemOriginal) {
-      return alert('Mensagem original não encontrada para duplicação.');
-    }
-
-    const novaMensagem = {
-      ...mensagemOriginal, // Copia todos os campos (texto, categoria, anexos, etc.)
-      id: "msg_" + Date.now(), // Cria um novo ID único
-      titulo: `Cópia de ${mensagemOriginal.titulo}`, // Adiciona "Cópia de" ao título
-      atalho: "" // Limpa o atalho para evitar conflitos
-    };
-
-    // Adiciona a nova mensagem logo após a original na lista
-    const indexOriginal = mensagens.findIndex(m => m.id === idOriginal);
-    mensagens.splice(indexOriginal + 1, 0, novaMensagem);
-
-    chrome.storage.local.set({ mensagens }, () => {
-      carregarMensagens();
-      chrome.runtime.sendMessage({ acao: "atualizar_menu" });
-    });
-  });
-}
-
 function deletarMensagem(id) {
   if (idMensagemEmEdicao === id) resetarFormulario();
   chrome.storage.local.get({ mensagens: [] }, (resultado) => {
@@ -1110,9 +1116,10 @@ btnCarregarPadrao.addEventListener('click', () => {
         const tratadas = mensagensImportar.map((msg, index) => ({
           id: "msg_" + Date.now() + "_" + index + "_" + Math.floor(Math.random() * 1000),
           titulo: msg.titulo || "Sem Título",
-          atalho: (msg.atalho || "").replace('--', '').trim().toLowerCase(),
+          atalho: (msg.atalho || "").replace('--', '').trim().toLowerCase(), // Limpa o atalho
           categoria: msg.categoria || "Outros",
-          texto: msg.texto || ""
+          texto: msg.texto || "",
+          useCount: msg.useCount || 0 // Garante que o contador exista
         }));
 
         // Garante a criação automática das pastas das mensagens
@@ -1122,26 +1129,16 @@ btnCarregarPadrao.addEventListener('click', () => {
           }
         });
 
-        pastasImportar.forEach(p => {
+        pastasImportar.forEach(p => { // Adiciona pastas do arquivo de backup que não existem
           if (p.nome && !atuaisPastas.some(pasta => pasta.nome === p.nome)) {
             atuaisPastas.push(p);
           }
         });
 
         atuaisPastas.sort((a, b) => a.nome.localeCompare(b.nome));
-        
-        // Filtra mensagens que já existem (baseado em título e texto)
-        const existingMessageHashes = new Set(atuaisMensagens.map(msg => `${msg.titulo}|${msg.texto}`));
-        const novasMensagensUnicas = tratadas.filter(msg => {
-          const msgHash = `${msg.titulo}|${msg.texto}`;
-          if (existingMessageHashes.has(msgHash)) {
-            return false; // Ignora se já existe
-          }
-          return true;
-        });
 
         // Salva tudo de uma vez no banco local deste computador
-        const mensagensFinais = [...atuaisMensagens, ...novasMensagensUnicas];
+        const mensagensFinais = [...atuaisMensagens, ...tratadas];
         chrome.storage.local.set({ mensagens: mensagensFinais, pastas: atuaisPastas }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
