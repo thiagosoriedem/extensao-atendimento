@@ -4,6 +4,7 @@ let campoAtivo = null;
 let mensagensLocais = [];
 let mapeamentoAgendaLocal = {};
 let termoPesquisaAtual = "";
+let configSugestoesAtivas = true;
 
 // Variáveis para controle do Tooltip
 let timerTooltip = null;
@@ -45,6 +46,14 @@ function carregarMensagensEAtalhos() {
 }
 carregarMensagensEAtalhos();
 
+// Carrega as configurações da extensão
+function carregarConfiguracoes() {
+  chrome.storage.local.get({ configSugestoesTexto: true }, (data) => {
+    configSugestoesAtivas = data.configSugestoesTexto;
+  });
+}
+carregarConfiguracoes();
+
 // Carrega o mapeamento da agenda para a Smart Tag {{medicos}}
 function carregarMapeamentoAgenda() {
     chrome.storage.local.get({ mapeamentoAgenda: {} }, (resultado) => {
@@ -60,6 +69,12 @@ chrome.storage.onChanged.addListener((alteracoes) => {
   }
   if (alteracoes.mapeamentoAgenda) {
     mapeamentoAgendaLocal = alteracoes.mapeamentoAgenda.newValue || {};
+  }
+  if (alteracoes.configSugestoesTexto) {
+    configSugestoesAtivas = alteracoes.configSugestoesTexto.newValue;
+    if (!configSugestoesAtivas) {
+      removerMenu();
+    }
   }
 });
 
@@ -139,6 +154,12 @@ document.addEventListener('input', (evento) => {
   if (texto.substring(0, cursor).endsWith('--')) {
     termoPesquisaAtual = "";
     abrirMenuMensagens(campo);
+    return;
+  }
+
+  // Se a funcionalidade estiver desativada, remove qualquer menu e para a execução.
+  if (!configSugestoesAtivas) {
+    removerMenu();
     return;
   }
 

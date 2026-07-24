@@ -225,6 +225,24 @@
     .stats-item.never-used { background-color: var(--background); }
     .stats-item.never-used .stats-item-title { color: var(--text-secondary); }
     .stats-item.never-used .stats-item-count { display: none; }
+
+    /* Estilos da Tela de Configurações */
+    .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .setting-item:last-child { border-bottom: none; }
+    .setting-info { flex: 1; margin-right: 16px; }
+    .setting-info label { font-size: 14px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--text); margin-bottom: 2px; }
+    .setting-info p { font-size: 11px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
+    body:not(.dark-mode) .slider { background-color: #e2e8f0; }
+    body.dark-mode .slider { background-color: #475569; }
+    input:checked + .slider { background-color: var(--primary); }
+    input:focus + .slider { box-shadow: 0 0 1px var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .slider.round { border-radius: 24px; }
+    .slider.round:before { border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -248,6 +266,10 @@
       <button id="nav-btn-estatisticas" class="nav-link">
         <span class="material-icons-round">bar_chart</span>
         <span>Estatísticas</span>
+      </button>
+      <button id="nav-btn-configuracoes" class="nav-link">
+        <span class="material-icons-round">settings</span>
+        <span>Configurações</span>
       </button>
     </div>
     <div class="sidebar-footer">
@@ -422,6 +444,34 @@
         <div class="stats-card">
           <h3><span class="material-icons-round" style="color: var(--text-secondary);">do_not_disturb_on</span> Nunca Utilizadas</h3>
           <ul id="lista-nunca-usadas" class="stats-list scrollable"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="tela-configuracoes" style="display: none;">
+      <div class="header">
+        <h2><span class="material-icons-round" style="color: var(--primary);">settings</span><span>Configurações</span></h2>
+      </div>
+      <div class="card">
+        <div class="setting-item">
+            <div class="setting-info">
+                <label>Sugestões Automáticas de Texto</label>
+                <p>Exibe sugestões de mensagens, médicos e unidades enquanto você digita.</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-sugestoes-texto">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <div class="setting-info">
+                <label>Sugestão de Unidade na Agenda</label>
+                <p>Mostra um botão para trocar a unidade automaticamente na página da agenda do MedicalSys.</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-sugestao-agenda">
+                <span class="slider round"></span>
+            </label>
         </div>
       </div>
     </div>

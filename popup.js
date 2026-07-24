@@ -50,6 +50,7 @@ const btnIniciarRemarcacao = document.getElementById('btnIniciarRemarcacao');
 const navBtnMensagens = document.getElementById('nav-btn-mensagens');
 const navBtnAgenda = document.getElementById('nav-btn-agenda');
 const navBtnEstatisticas = document.getElementById('nav-btn-estatisticas');
+const navBtnConfiguracoes = document.getElementById('nav-btn-configuracoes');
 
 // Elementos de Tema
 const btnToggleTheme = document.getElementById('btnToggleTheme');
@@ -64,6 +65,11 @@ const statsTotalUsos = document.getElementById('stats-total-usos');
 const statsTotalMensagens = document.getElementById('stats-total-mensagens');
 const statsMensagensNaoUsadas = document.getElementById('stats-mensagens-nao-usadas');
 const btnZerarEstatisticas = document.getElementById('btnZerarEstatisticas');
+
+// Elementos de Configurações
+const telaConfiguracoes = document.getElementById('tela-configuracoes');
+const toggleSugestoesTexto = document.getElementById('toggle-sugestoes-texto');
+const toggleSugestaoAgenda = document.getElementById('toggle-sugestao-agenda');
 
 let idMensagemEmEdicao = null;
 let pastaEmEdicaoNome = null;
@@ -92,6 +98,7 @@ navBtnAgenda.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
   telaRemarcacao.style.display = 'none';
   telaEstatisticas.style.display = 'none';
+  telaConfiguracoes.style.display = 'none';
   telaAgenda.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
@@ -105,10 +112,12 @@ navBtnMensagens.addEventListener('click', () => {
   telaPrincipal.style.display = 'block';
   telaAgenda.style.display = 'none';
   telaRemarcacao.style.display = 'none';
+  telaConfiguracoes.style.display = 'none';
   telaEstatisticas.style.display = 'none';
   navBtnAgenda.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
+  navBtnConfiguracoes.classList.remove('active');
   navBtnMensagens.classList.add('active');
   chrome.storage.local.set({ activeScreen: 'mensagens' });
 });
@@ -117,10 +126,12 @@ navBtnRemarcacao.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
   telaAgenda.style.display = 'none';
   telaEstatisticas.style.display = 'none';
+  telaConfiguracoes.style.display = 'none';
   telaRemarcacao.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnAgenda.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
+  navBtnConfiguracoes.classList.remove('active');
   navBtnRemarcacao.classList.add('active');
   carregarAgendasRemarcacao();
   chrome.storage.local.set({ activeScreen: 'remarcacao' });
@@ -130,13 +141,29 @@ navBtnEstatisticas.addEventListener('click', () => {
   telaPrincipal.style.display = 'none';
   telaAgenda.style.display = 'none';
   telaRemarcacao.style.display = 'none';
+  telaConfiguracoes.style.display = 'none';
   telaEstatisticas.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnAgenda.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
+  navBtnConfiguracoes.classList.remove('active');
   navBtnEstatisticas.classList.add('active');
   carregarEstatisticas();
   chrome.storage.local.set({ activeScreen: 'estatisticas' });
+});
+
+navBtnConfiguracoes.addEventListener('click', () => {
+  telaPrincipal.style.display = 'none';
+  telaAgenda.style.display = 'none';
+  telaRemarcacao.style.display = 'none';
+  telaEstatisticas.style.display = 'none';
+  telaConfiguracoes.style.display = 'block';
+  navBtnMensagens.classList.remove('active');
+  navBtnAgenda.classList.remove('active');
+  navBtnRemarcacao.classList.remove('active');
+  navBtnEstatisticas.classList.remove('active');
+  navBtnConfiguracoes.classList.add('active');
+  chrome.storage.local.set({ activeScreen: 'configuracoes' });
 });
 
 function getIconeAnexo(tipo) {
@@ -230,6 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById(`nav-btn-${data.activeScreen}`)?.click();
     }
   });
+
+  // Carrega o estado das configurações
+  chrome.storage.local.get({
+    configSugestoesTexto: true,
+    configSugestaoAgenda: true
+  }, (data) => {
+    toggleSugestoesTexto.checked = data.configSugestoesTexto;
+    toggleSugestaoAgenda.checked = data.configSugestaoAgenda;
+  });
 });
 
 campoBusca.addEventListener('input', (e) => {
@@ -261,6 +297,15 @@ function toggleTheme() {
 }
 btnToggleTheme.addEventListener('click', () => {
   toggleTheme();
+});
+
+// ================== LISTENERS DE CONFIGURAÇÕES ==================
+toggleSugestoesTexto.addEventListener('change', (e) => {
+  chrome.storage.local.set({ configSugestoesTexto: e.target.checked });
+});
+
+toggleSugestaoAgenda.addEventListener('change', (e) => {
+  chrome.storage.local.set({ configSugestaoAgenda: e.target.checked });
 });
 
 // ================== GERENCIAMENTO DE AGENDA ==================

@@ -2,6 +2,7 @@
 
 console.log("Telefonia SOS - Módulo de Agenda carregado.");
 let mapeamentoMedicoUnidade = {};
+let configSugestaoAgendaAtiva = true;
 
 // Carrega o mapeamento do storage ao iniciar
 function carregarMapeamento() {
@@ -15,6 +16,23 @@ function carregarMapeamento() {
     });
 }
 
+// Carrega as configurações da extensão
+function carregarConfiguracoesAgenda() {
+    chrome.storage.local.get({ configSugestaoAgenda: true }, (data) => {
+        configSugestaoAgendaAtiva = data.configSugestaoAgenda;
+        if (!configSugestaoAgendaAtiva) {
+            removerBotaoInjetado();
+        }
+    });
+}
+
+function removerBotaoInjetado() {
+    const botaoAntigo = document.getElementById('ts-troca-automatica');
+    if (botaoAntigo) {
+        botaoAntigo.remove();
+    }
+}
+
 // Escuta por mudanças no storage para atualizar o mapeamento em tempo real
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.mapeamentoAgenda) {
@@ -24,6 +42,17 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         const selectProfissional = document.getElementById('calendarProfissional');
         if (selectProfissional && selectProfissional.value) {
             injetarBotao(selectProfissional);
+        }
+    }
+    if (namespace === 'local' && changes.configSugestaoAgenda) {
+        configSugestaoAgendaAtiva = changes.configSugestaoAgenda.newValue;
+        if (!configSugestaoAgendaAtiva) {
+            removerBotaoInjetado();
+        } else {
+            const selectProfissional = document.getElementById('calendarProfissional');
+            if (selectProfissional && selectProfissional.value) {
+                injetarBotao(selectProfissional);
+            }
         }
     }
 });
@@ -77,9 +106,10 @@ function trocarUnidade(unidadeNome) {
 
 function injetarBotao(selectProfissional) {
     // Garante a remoção de qualquer botão ou mensagem anterior antes de processar.
-    const botaoAntigo = document.getElementById('ts-troca-automatica');
-    if (botaoAntigo) {
-        botaoAntigo.remove();
+    removerBotaoInjetado();
+
+    if (!configSugestaoAgendaAtiva) {
+        return;
     }
 
     const medicoId = selectProfissional.value;
@@ -189,6 +219,7 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // Carrega os dados iniciais
 carregarMapeamento();
+carregarConfiguracoesAgenda();
 
 // ================== LÓGICA DE REMARCAÇÃO EM LOTE ==================
 
