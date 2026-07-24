@@ -1,7 +1,5 @@
 // background.js
 
-let mensagensArmazenadas = [];
-
 function atualizarMenuContexto() {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
@@ -14,7 +12,6 @@ function atualizarMenuContexto() {
       mensagens: [], 
       pastas: ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"] 
     }, (resultado) => {
-      mensagensArmazenadas = resultado.mensagens || []; // Armazena as mensagens
       const menusCriados = new Set();
 
       resultado.pastas.forEach(caminho => {
@@ -58,14 +55,16 @@ chrome.runtime.onInstalled.addListener(atualizarMenuContexto);
 chrome.runtime.onStartup.addListener(atualizarMenuContexto);
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  const mensagemClicada = mensagensArmazenadas.find(msg => msg.id === info.menuItemId);
-  if (mensagemClicada && tab.id) {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: processarEInjetarTextoDoMenu,
-      args: [mensagemClicada.texto]
-    });
-  }
+  chrome.storage.local.get({ mensagens: [] }, (resultado) => {
+    const mensagemClicada = resultado.mensagens.find(msg => msg.id === info.menuItemId);
+    if (mensagemClicada && tab.id) {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: processarEInjetarTextoDoMenu,
+        args: [mensagemClicada.texto]
+      });
+    }
+  });
 });
 
 chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
@@ -142,20 +141,61 @@ chrome.runtime.onMessage.addListener((requisicao, sender, enviarResposta) => {
       .catch(err => console.error("Falha ao executar script de clique:", err));
     return true; // Manter canal aberto para resposta assíncrona.
   }
+
+  if (requisicao.acao === 'autoLogin') {
+    const cred = requisicao.credencial;
+    if (!cred) return true;
+
+    chrome.tabs.create({ url: cred.loginUrl, active: true }, (tab) => {
+      const listener = (tabId, changeInfo) => {
+        if (tabId === tab.id && changeInfo.status === 'complete') {
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: preencherEAutenticar,
+            args: [cred]
+          });
+          chrome.tabs.onUpdated.removeListener(listener);
+        }
+      };
+      chrome.tabs.onUpdated.addListener(listener);
+    });
+    return true;
+  }
 });
+
+// Função injetada na página de login para preencher e clicar
+function preencherEAutenticar(cred) {
+  const userInput = document.querySelector(cred.userSelector);
+  const passInput = document.querySelector(cred.passSelector);
+  const loginBtn = document.querySelector(cred.btnSelector);
+
+  if (userInput && passInput && loginBtn) {
+    // Função para simular digitação humana
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    
+    nativeInputValueSetter.call(userInput, cred.usuario);
+    userInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    nativeInputValueSetter.call(passInput, cred.senha);
+    passInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    setTimeout(() => {
+      loginBtn.click();
+    }, 500); // Pequeno atraso antes de clicar
+
+  } else {
+    console.error('Telefonia SOS: Elementos de login não encontrados. Verifique os seletores CSS nas configurações.', { userInput, passInput, loginBtn });
+    alert('Telefonia SOS: Não foi possível encontrar os campos de login na página. Verifique os seletores CSS nas configurações de automação.');
+  }
+};
 
 function processarEInjetarTextoDoMenu(textoOriginal) {
   let textoFinal = textoOriginal;
-  const nomeAutomatico = null; // Funcionalidade de nome automático removida
-
-  const horaAtual = new Date().getHours();
-  let saudacao = "";
-  if (horaAtual >= 5 && horaAtual < 12) {
-    saudacao = "Bom dia";
-  } else if (horaAtual >= 12 && horaAtual < 18) {
-    saudacao = "Boa tarde";
-  } else {
-    saudacao = "Boa noite";
+  let nomeAutomatico = null;
+  const elementoNome = document.querySelector('.name span') || document.querySelector('.name');
+  if (elementoNome) {
+    let nomeLimpo = (elementoNome.textContent || elementoNome.innerText || "").trim().split('\n')[0];
+    if (nomeLimpo.length > 0) nomeAutomatico = nomeLimpo;
   }
 
   const mapaTags = [
@@ -167,8 +207,7 @@ function processarEInjetarTextoDoMenu(textoOriginal) {
     { tag: "{valor}", promptMsg: "Digite o VALOR:", valorAuto: null },
     { tag: "{data}", promptMsg: "Digite a DATA:", valorAuto: null },
     { tag: "{hora}", promptMsg: "Digite o HORÁRIO:", valorAuto: null },
-    { tag: "{cpf}", promptMsg: "Digite o CPF:", valorAuto: null },
-    { tag: "{saudacao}", promptMsg: "", valorAuto: saudacao }
+    { tag: "{cpf}", promptMsg: "Digite o CPF:", valorAuto: null }
   ];
 
   for (const item of mapaTags) {

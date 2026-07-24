@@ -51,6 +51,7 @@ const navBtnMensagens = document.getElementById('nav-btn-mensagens');
 const navBtnAgenda = document.getElementById('nav-btn-agenda');
 const navBtnEstatisticas = document.getElementById('nav-btn-estatisticas');
 const navBtnConfiguracoes = document.getElementById('nav-btn-configuracoes');
+const navBtnAutomacao = document.getElementById('nav-btn-automacao');
 
 // Elementos de Tema
 const btnToggleTheme = document.getElementById('btnToggleTheme');
@@ -71,12 +72,31 @@ const telaConfiguracoes = document.getElementById('tela-configuracoes');
 const toggleSugestoesTexto = document.getElementById('toggle-sugestoes-texto');
 const toggleSugestaoAgenda = document.getElementById('toggle-sugestao-agenda');
 
+// Elementos de Automação
+const telaAutomacao = document.getElementById('tela-automacao');
+const tituloFormCredencial = document.getElementById('tituloFormCredencial');
+const inputSiteNome = document.getElementById('automacao-site-nome');
+const inputLoginUrl = document.getElementById('automacao-login-url');
+const inputUsuarioValor = document.getElementById('automacao-usuario-valor');
+const inputSenhaValor = document.getElementById('automacao-senha-valor');
+const inputUsuarioSelector = document.getElementById('automacao-usuario-selector');
+const inputSenhaSelector = document.getElementById('automacao-senha-selector');
+const inputBotaoSelector = document.getElementById('automacao-botao-selector');
+const btnSalvarCredencial = document.getElementById('btnSalvarCredencial');
+const btnCancelarCredencial = document.getElementById('btnCancelarCredencial');
+const iconeBotaoCredencial = document.getElementById('iconeBotaoCredencial');
+const textoBotaoCredencial = document.getElementById('textoBotaoCredencial');
+const listaAcoesLogin = document.getElementById('lista-acoes-login');
+const listaCredenciaisGerenciador = document.getElementById('lista-credenciais-gerenciador');
+const btnLogarEmTodos = document.getElementById('btnLogarEmTodos');
+
 let idMensagemEmEdicao = null;
 let pastaEmEdicaoNome = null;
 let todasAsMensagens = [];
 let itemArrastado = null;
 let todasAsPastas = []; // Armazena as pastas com suas cores
 let anexosTemporarios = []; // Array para armazenar anexos antes de salvar
+let idCredencialEmEdicao = null;
 
 const PASTAS_PADRAO = ["Consultas > Geral", "Exames > Geral", "Administrativo > Geral", "Outros"];
 const UNIDADES_DISPONIVEIS = [
@@ -99,11 +119,13 @@ navBtnAgenda.addEventListener('click', () => {
   telaRemarcacao.style.display = 'none';
   telaEstatisticas.style.display = 'none';
   telaConfiguracoes.style.display = 'none';
+  telaAutomacao.style.display = 'none';
   telaAgenda.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
   navBtnConfiguracoes.classList.remove('active');
+  navBtnAutomacao.classList.remove('active');
   navBtnAgenda.classList.add('active');
   carregarEditorAgenda();
   chrome.storage.local.set({ activeScreen: 'agenda' });
@@ -115,10 +137,12 @@ navBtnMensagens.addEventListener('click', () => {
   telaRemarcacao.style.display = 'none';
   telaConfiguracoes.style.display = 'none';
   telaEstatisticas.style.display = 'none';
+  telaAutomacao.style.display = 'none';
   navBtnAgenda.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
   navBtnConfiguracoes.classList.remove('active');
+  navBtnAutomacao.classList.remove('active');
   navBtnMensagens.classList.add('active');
   chrome.storage.local.set({ activeScreen: 'mensagens' });
 });
@@ -128,11 +152,13 @@ navBtnRemarcacao.addEventListener('click', () => {
   telaAgenda.style.display = 'none';
   telaEstatisticas.style.display = 'none';
   telaConfiguracoes.style.display = 'none';
+  telaAutomacao.style.display = 'none';
   telaRemarcacao.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnAgenda.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
   navBtnConfiguracoes.classList.remove('active');
+  navBtnAutomacao.classList.remove('active');
   navBtnRemarcacao.classList.add('active');
   carregarAgendasRemarcacao();
   chrome.storage.local.set({ activeScreen: 'remarcacao' });
@@ -143,11 +169,13 @@ navBtnEstatisticas.addEventListener('click', () => {
   telaAgenda.style.display = 'none';
   telaRemarcacao.style.display = 'none';
   telaConfiguracoes.style.display = 'none';
+  telaAutomacao.style.display = 'none';
   telaEstatisticas.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnAgenda.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
   navBtnConfiguracoes.classList.remove('active');
+  navBtnAutomacao.classList.remove('active');
   navBtnEstatisticas.classList.add('active');
   carregarEstatisticas();
   chrome.storage.local.set({ activeScreen: 'estatisticas' });
@@ -158,13 +186,31 @@ navBtnConfiguracoes.addEventListener('click', () => {
   telaAgenda.style.display = 'none';
   telaRemarcacao.style.display = 'none';
   telaEstatisticas.style.display = 'none';
+  telaAutomacao.style.display = 'none';
   telaConfiguracoes.style.display = 'block';
   navBtnMensagens.classList.remove('active');
   navBtnAgenda.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
+  navBtnAutomacao.classList.remove('active');
   navBtnConfiguracoes.classList.add('active');
   chrome.storage.local.set({ activeScreen: 'configuracoes' });
+});
+
+navBtnAutomacao.addEventListener('click', () => {
+  telaPrincipal.style.display = 'none';
+  telaAgenda.style.display = 'none';
+  telaRemarcacao.style.display = 'none';
+  telaEstatisticas.style.display = 'none';
+  telaConfiguracoes.style.display = 'none';
+  telaAutomacao.style.display = 'block';
+  navBtnMensagens.classList.remove('active');
+  navBtnAgenda.classList.remove('active');
+  navBtnRemarcacao.classList.remove('active');
+  navBtnEstatisticas.classList.remove('active');
+  navBtnConfiguracoes.classList.remove('active');
+  navBtnAutomacao.classList.add('active');
+  chrome.storage.local.set({ activeScreen: 'automacao' });
 });
 
 function getIconeAnexo(tipo) {
@@ -249,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
   campoBuscaAgenda.addEventListener('input', filtrarMedicosAgenda);
   inputImportarAgenda.addEventListener('change', importarDadosAgenda);
   btnIniciarRemarcacao.addEventListener('click', iniciarRemarcacao);
+  carregarCredenciais();
   inicializarAgenda();
 
   // Restaura a última tela ativa para melhorar a persistência ao fixar a janela
@@ -307,6 +354,147 @@ toggleSugestoesTexto.addEventListener('change', (e) => {
 
 toggleSugestaoAgenda.addEventListener('change', (e) => {
   chrome.storage.local.set({ configSugestaoAgenda: e.target.checked });
+});
+
+// ================== GERENCIAMENTO DE AUTOMAÇÃO E CREDENCIAIS ==================
+
+function carregarCredenciais() {
+  chrome.storage.local.get({ credenciais: [] }, (data) => {
+    const credenciais = data.credenciais || [];
+    listaCredenciaisGerenciador.innerHTML = '';
+    listaAcoesLogin.innerHTML = '';
+
+    if (credenciais.length === 0) {
+      listaAcoesLogin.innerHTML = '<p style="font-size:11px; color:var(--text-secondary); text-align:center;">Nenhuma credencial salva.</p>';
+      listaCredenciaisGerenciador.innerHTML = '<p style="font-size:11px; color:var(--text-secondary); text-align:center;">Nenhuma credencial salva.</p>';
+      return;
+    }
+
+    credenciais.forEach(cred => {
+      // Popula a lista de gerenciamento
+      const divGerenciador = document.createElement('div');
+      divGerenciador.className = 'item-pasta-gerencia';
+      divGerenciador.innerHTML = `
+        <span class="item-pasta-nome" title="${cred.nome}">${cred.nome}</span>
+        <div class="acoes-item">
+          <button class="btn-acao editar-credencial" style="padding:2px;" title="Editar Credencial"><span class="material-icons-round" style="font-size:14px; color:var(--warning);">edit</span></button>
+          <button class="btn-acao deletar-credencial" style="padding:2px;" title="Excluir Credencial"><span class="material-icons-round" style="font-size:14px; color:var(--danger);">delete</span></button>
+        </div>
+      `;
+      divGerenciador.querySelector('.editar-credencial').addEventListener('click', () => prepararEdicaoCredencial(cred.id));
+      divGerenciador.querySelector('.deletar-credencial').addEventListener('click', () => deletarCredencial(cred.id));
+      listaCredenciaisGerenciador.appendChild(divGerenciador);
+
+      // Popula o painel de ações
+      const divAcao = document.createElement('div');
+      divAcao.className = 'item-pasta-gerencia';
+      divAcao.innerHTML = `
+        <span class="item-pasta-nome" title="${cred.nome}">${cred.nome}</span>
+        <button class="btn-backup btn-login-individual" style="flex: 0.5; background-color: var(--primary-light); color: var(--primary);">
+          <span class="material-icons-round" style="font-size:14px;">login</span> Login
+        </button>
+      `;
+      divAcao.querySelector('.btn-login-individual').addEventListener('click', () => {
+        chrome.runtime.sendMessage({ acao: 'autoLogin', credencial: cred });
+      });
+      listaAcoesLogin.appendChild(divAcao);
+    });
+  });
+}
+
+function prepararEdicaoCredencial(id) {
+  chrome.storage.local.get({ credenciais: [] }, (data) => {
+    const credencial = data.credenciais.find(c => c.id === id);
+    if (credencial) {
+      idCredencialEmEdicao = id;
+      inputSiteNome.value = credencial.nome;
+      inputLoginUrl.value = credencial.loginUrl;
+      inputUsuarioValor.value = credencial.usuario;
+      inputSenhaValor.value = credencial.senha;
+      inputUsuarioSelector.value = credencial.userSelector || '';
+      inputSenhaSelector.value = credencial.passSelector || '';
+      inputBotaoSelector.value = credencial.btnSelector || '';
+
+      tituloFormCredencial.textContent = "Editar Credencial";
+      textoBotaoCredencial.textContent = "Atualizar";
+      iconeBotaoCredencial.textContent = "edit";
+      btnSalvarCredencial.classList.add('modo-edicao');
+      btnCancelarCredencial.style.display = 'block';
+      inputSiteNome.focus();
+    }
+  });
+}
+
+function resetarFormularioCredencial() {
+  idCredencialEmEdicao = null;
+  tituloFormCredencial.textContent = "Adicionar Nova Credencial";
+  textoBotaoCredencial.textContent = "Salvar Credencial";
+  iconeBotaoCredencial.textContent = "add_circle_outline";
+  btnSalvarCredencial.classList.remove('modo-edicao');
+  btnCancelarCredencial.style.display = 'none';
+  // Limpa os campos individualmente, pois o container não é um <form>
+  inputSiteNome.value = '';
+  inputLoginUrl.value = '';
+  inputUsuarioValor.value = '';
+  inputSenhaValor.value = '';
+  inputUsuarioSelector.value = '';
+  inputSenhaSelector.value = '';
+  inputBotaoSelector.value = '';
+}
+
+function deletarCredencial(id) {
+  if (!confirm("Tem certeza que deseja excluir esta credencial?")) return;
+  chrome.storage.local.get({ credenciais: [] }, (data) => {
+    const novasCredenciais = data.credenciais.filter(c => c.id !== id);
+    chrome.storage.local.set({ credenciais: novasCredenciais }, carregarCredenciais);
+  });
+}
+
+btnSalvarCredencial.addEventListener('click', () => {
+  const credencial = {
+    id: idCredencialEmEdicao || `cred_${Date.now()}`,
+    nome: inputSiteNome.value.trim(),
+    loginUrl: inputLoginUrl.value.trim(),
+    usuario: inputUsuarioValor.value.trim(),
+    senha: inputSenhaValor.value.trim(),
+    userSelector: inputUsuarioSelector.value.trim() || '#username, #user, [name="username"]', // Padrões comuns
+    passSelector: inputSenhaSelector.value.trim() || '#password, #pass, [name="password"]',
+    btnSelector: inputBotaoSelector.value.trim() || 'button[type="submit"], input[type="submit"]',
+  };
+
+  if (!credencial.nome || !credencial.loginUrl || !credencial.usuario || !credencial.senha) {
+    return alert('Nome do site, URL, usuário e senha são obrigatórios.');
+  }
+
+  chrome.storage.local.get({ credenciais: [] }, (data) => {
+    let credenciais = data.credenciais || [];
+    if (idCredencialEmEdicao) {
+      credenciais = credenciais.map(c => c.id === idCredencialEmEdicao ? credencial : c);
+    } else {
+      credenciais.push(credencial);
+    }
+    chrome.storage.local.set({ credenciais }, () => {
+      alert('Credencial salva com sucesso!');
+      resetarFormularioCredencial();
+      carregarCredenciais();
+    });
+  });
+});
+
+btnCancelarCredencial.addEventListener('click', resetarFormularioCredencial);
+
+btnLogarEmTodos.addEventListener('click', () => {
+  if (!confirm("Isso abrirá várias abas para logar em todos os sites salvos. Deseja continuar?")) return;
+  chrome.storage.local.get({ credenciais: [] }, (data) => {
+    const credenciais = data.credenciais || [];
+    if (credenciais.length > 0) {
+      credenciais.forEach(cred => {
+        chrome.runtime.sendMessage({ acao: 'autoLogin', credencial: cred });
+      });
+    } else {
+      alert('Nenhuma credencial salva para automatizar.');
+    }
+  });
 });
 
 // ================== GERENCIAMENTO DE AGENDA ==================

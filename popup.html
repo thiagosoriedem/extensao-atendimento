@@ -267,6 +267,10 @@
         <span class="material-icons-round">bar_chart</span>
         <span>Estatísticas</span>
       </button>
+      <button id="nav-btn-automacao" class="nav-link">
+        <span class="material-icons-round">smart_toy</span>
+        <span>Automação</span>
+      </button>
     </div>
     <div class="sidebar-footer">
       <button id="nav-btn-configuracoes" class="nav-link" title="Configurações">
@@ -474,6 +478,57 @@
             </label>
         </div>
       </div>
+    </div>
+
+    <div id="tela-automacao" style="display: none;">
+      <div class="header">
+        <h2><span class="material-icons-round" style="color: var(--primary);">smart_toy</span><span>Automação de Login</span></h2>
+      </div>
+      <div class="card">
+        <label id="tituloFormCredencial">Adicionar Nova Credencial</label>
+        <div class="form-linha">
+          <div class="form-grupo">
+            <input type="text" id="automacao-site-nome" placeholder="Nome do Site (Ex: MedicalSys)">
+          </div>
+          <div class="form-grupo">
+            <input type="text" id="automacao-login-url" placeholder="URL de Login">
+          </div>
+        </div>
+        <div class="form-linha">
+          <div class="form-grupo">
+            <input type="text" id="automacao-usuario-valor" placeholder="Seu Usuário">
+          </div>
+          <div class="form-grupo">
+            <input type="password" id="automacao-senha-valor" placeholder="Sua Senha">
+          </div>
+        </div>
+        <p style="font-size: 11px; color: var(--text-secondary); margin: 10px 0 4px 0;">(Opcional) Seletores CSS para campos customizados:</p>
+        <div class="form-linha">
+          <div class="form-grupo">
+            <input type="text" id="automacao-usuario-selector" placeholder="Seletor do campo de usuário">
+          </div>
+          <div class="form-grupo">
+            <input type="text" id="automacao-senha-selector" placeholder="Seletor do campo de senha">
+          </div>
+          <div class="form-grupo">
+            <input type="text" id="automacao-botao-selector" placeholder="Seletor do botão de login">
+          </div>
+        </div>
+        <div class="botoes-container" style="margin-top: 10px;">
+          <button id="btnCancelarCredencial" class="btn-cancelar">Cancelar</button>
+          <button id="btnSalvarCredencial" class="btn-principal">
+            <span id="iconeBotaoCredencial" class="material-icons-round">add_circle_outline</span> 
+            <span id="textoBotaoCredencial">Salvar Credencial</span>
+          </button>
+        </div>
+      </div>
+      <div class="secao-titulo" style="margin-top: 16px;">Painel de Ações</div>
+      <div id="lista-acoes-login" class="lista-pastas-gerenciador" style="max-height: 100px;"></div>
+      <div class="botoes-container" style="margin-top: 8px;">
+        <button id="btnLogarEmTodos" class="btn-principal" style="background-color: var(--primary);"><span class="material-icons-round">login</span> Logar em Todos</button>
+      </div>
+      <div class="secao-titulo" style="margin-top: 16px;">Credenciais Salvas</div>
+      <div id="lista-credenciais-gerenciador" class="lista-pastas-gerenciador" style="max-height: 120px;"></div>
     </div>
   </main>
 
