@@ -98,6 +98,7 @@ navBtnAgenda.addEventListener('click', () => {
   navBtnEstatisticas.classList.remove('active');
   navBtnAgenda.classList.add('active');
   carregarEditorAgenda();
+  chrome.storage.local.set({ activeScreen: 'agenda' });
 });
 
 navBtnMensagens.addEventListener('click', () => {
@@ -109,6 +110,7 @@ navBtnMensagens.addEventListener('click', () => {
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
   navBtnMensagens.classList.add('active');
+  chrome.storage.local.set({ activeScreen: 'mensagens' });
 });
 
 navBtnRemarcacao.addEventListener('click', () => {
@@ -121,6 +123,7 @@ navBtnRemarcacao.addEventListener('click', () => {
   navBtnEstatisticas.classList.remove('active');
   navBtnRemarcacao.classList.add('active');
   carregarAgendasRemarcacao();
+  chrome.storage.local.set({ activeScreen: 'remarcacao' });
 });
 
 navBtnEstatisticas.addEventListener('click', () => {
@@ -133,6 +136,7 @@ navBtnEstatisticas.addEventListener('click', () => {
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.add('active');
   carregarEstatisticas();
+  chrome.storage.local.set({ activeScreen: 'estatisticas' });
 });
 
 function getIconeAnexo(tipo) {
@@ -218,6 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
   inputImportarAgenda.addEventListener('change', importarDadosAgenda);
   btnIniciarRemarcacao.addEventListener('click', iniciarRemarcacao);
   inicializarAgenda();
+
+  // Restaura a última tela ativa para melhorar a persistência ao fixar a janela
+  chrome.storage.local.get({ activeScreen: 'mensagens' }, (data) => {
+    // Clica no botão correspondente se não for a tela padrão (mensagens)
+    if (data.activeScreen && data.activeScreen !== 'mensagens') {
+      document.getElementById(`nav-btn-${data.activeScreen}`)?.click();
+    }
+  });
 });
 
 campoBusca.addEventListener('input', (e) => {
@@ -225,7 +237,7 @@ campoBusca.addEventListener('input', (e) => {
 });
 
 btnFixar.addEventListener('click', () => {
-  chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 580, height: 660 });
+  chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 580, height: 660 }, () => window.close());
 });
 
 // ================== GERENCIAMENTO DE TEMA ==================
