@@ -103,6 +103,7 @@ navBtnAgenda.addEventListener('click', () => {
   navBtnMensagens.classList.remove('active');
   navBtnRemarcacao.classList.remove('active');
   navBtnEstatisticas.classList.remove('active');
+  navBtnConfiguracoes.classList.remove('active');
   navBtnAgenda.classList.add('active');
   carregarEditorAgenda();
   chrome.storage.local.set({ activeScreen: 'agenda' });
