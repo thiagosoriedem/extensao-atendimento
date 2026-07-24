@@ -962,12 +962,13 @@ function deletarPasta(nome) {
 // ================== EXPORTAR / IMPORTAR ==================
 btnExportar.addEventListener('click', () => {
   // ... (código existente)
-  chrome.storage.local.get({ mensagens: [], pastas: [] }, (data) => {
+  chrome.storage.local.get({ mensagens: [], pastas: [], credenciais: [] }, (data) => {
     const mensagens = data.mensagens || [];
     const pastas = migrarEstruturaPastas(data.pastas);
+    const credenciais = data.credenciais || [];
 
-    if (mensagens.length === 0) return alert('Nenhuma mensagem para exportar!');
-    const dadosBackup = { mensagens: mensagens, pastas: pastas };
+    if (mensagens.length === 0 && credenciais.length === 0) return alert('Nenhum dado para exportar!');
+    const dadosBackup = { mensagens, pastas, credenciais };
     const blob = new Blob([JSON.stringify(dadosBackup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -987,10 +988,11 @@ inputImportar.addEventListener('change', (evento) => {
       const mensagensImportar = Array.isArray(dados) ? dados : (dados.mensagens || []);
       const pastasImportarRaw = Array.isArray(dados) ? [] : (dados.pastas || []);
       const pastasImportar = migrarEstruturaPastas(pastasImportarRaw);
+      const credenciaisImportar = dados.credenciais || [];
 
-      if (mensagensImportar.length === 0) return alert('Nenhum dado válido encontrado no arquivo.');
+      if (mensagensImportar.length === 0 && credenciaisImportar.length === 0) return alert('Nenhum dado válido encontrado no arquivo.');
 
-      chrome.storage.local.get({ mensagens: [], pastas: [] }, (resultado) => {
+      chrome.storage.local.get({ mensagens: [], pastas: [], credenciais: [] }, (resultado) => {
         const atuaisMensagens = resultado.mensagens || [];
         let atuaisPastas = migrarEstruturaPastas(resultado.pastas);
         const mapaPastasAtuais = new Map(atuaisPastas.map(p => [p.nome, p]));
@@ -1022,10 +1024,17 @@ inputImportar.addEventListener('change', (evento) => {
 
         const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
 
-        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: pastasFinais }, () => {
+        // Lógica de merge para credenciais, evitando duplicatas por nome
+        const atuaisCredenciais = resultado.credenciais || [];
+        const mapaCredenciaisAtuais = new Map(atuaisCredenciais.map(c => [c.nome, c]));
+        const novasCredenciais = credenciaisImportar.filter(c => !mapaCredenciaisAtuais.has(c.nome));
+        const credenciaisFinais = [...atuaisCredenciais, ...novasCredenciais];
+
+        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: pastasFinais, credenciais: credenciaisFinais }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
+            carregarCredenciais();
             alert('Perfeito! Toda a sua estrutura de mensagens e pastas foi importada com sucesso neste computador.');
           });
         });
@@ -1419,14 +1428,16 @@ btnCarregarPadrao.addEventListener('click', () => {
     .then(dados => {
       const mensagensImportar = Array.isArray(dados) ? dados : (dados.mensagens || []);
       const pastasImportar = Array.isArray(dados) ? [] : (dados.pastas || []);
+      const credenciaisImportar = dados.credenciais || [];
 
-      if (mensagensImportar.length === 0) {
+      if (mensagensImportar.length === 0 && credenciaisImportar.length === 0) {
         return alert('Nenhum dado válido encontrado dentro do arquivo backup_padrao.json.');
       }
 
       chrome.storage.local.get({ 
         mensagens: [],
-        pastas: []
+        pastas: [],
+        credenciais: []
       }, (resultado) => {
         const atuaisMensagens = resultado.mensagens || [];
         let atuaisPastas = migrarEstruturaPastas(resultado.pastas);
@@ -1456,12 +1467,19 @@ btnCarregarPadrao.addEventListener('click', () => {
 
         atuaisPastas.sort((a, b) => a.nome.localeCompare(b.nome));
 
+        // Lógica de merge para credenciais, evitando duplicatas por nome
+        const atuaisCredenciais = resultado.credenciais || [];
+        const mapaCredenciaisAtuais = new Map(atuaisCredenciais.map(c => [c.nome, c]));
+        const novasCredenciais = credenciaisImportar.filter(c => !mapaCredenciaisAtuais.has(c.nome));
+        const credenciaisFinais = [...atuaisCredenciais, ...novasCredenciais];
+
         // Salva tudo de uma vez no banco local deste computador
         const mensagensFinais = [...atuaisMensagens, ...tratadas];
-        chrome.storage.local.set({ mensagens: mensagensFinais, pastas: atuaisPastas }, () => {
+        chrome.storage.local.set({ mensagens: mensagensFinais, pastas: atuaisPastas, credenciais: credenciaisFinais }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
+            carregarCredenciais();
             alert('Sucesso! O banco de dados padrão da SOS Otorrino foi carregado e estruturado neste computador.');
           });
         });
