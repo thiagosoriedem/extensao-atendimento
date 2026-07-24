@@ -51,10 +51,19 @@ const navBtnMensagens = document.getElementById('nav-btn-mensagens');
 const navBtnAgenda = document.getElementById('nav-btn-agenda');
 const navBtnEstatisticas = document.getElementById('nav-btn-estatisticas');
 
+// Elementos de Tema
+const btnToggleTheme = document.getElementById('btnToggleTheme');
+const themeIcon = document.getElementById('theme-icon');
+
 // Elementos de Estatísticas
 const telaEstatisticas = document.getElementById('tela-estatisticas');
 const listaMaisUsadas = document.getElementById('lista-mais-usadas');
 const listaMenosUsadas = document.getElementById('lista-menos-usadas');
+const listaNuncaUsadas = document.getElementById('lista-nunca-usadas');
+const statsTotalUsos = document.getElementById('stats-total-usos');
+const statsTotalMensagens = document.getElementById('stats-total-mensagens');
+const statsMensagensNaoUsadas = document.getElementById('stats-mensagens-nao-usadas');
+const btnZerarEstatisticas = document.getElementById('btnZerarEstatisticas');
 
 let idMensagemEmEdicao = null;
 let pastaEmEdicaoNome = null;
@@ -202,6 +211,7 @@ inputAnexo.addEventListener('change', (evento) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  loadTheme();
   atualizarInterfacePastas();
   carregarMensagens();
   campoBuscaAgenda.addEventListener('input', filtrarMedicosAgenda);
@@ -216,6 +226,29 @@ campoBusca.addEventListener('input', (e) => {
 
 btnFixar.addEventListener('click', () => {
   chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 580, height: 660 });
+});
+
+// ================== GERENCIAMENTO DE TEMA ==================
+function loadTheme() {
+  chrome.storage.local.get({ theme: 'light' }, (data) => {
+    if (data.theme === 'dark') {
+      document.body.classList.add('dark-mode');
+      themeIcon.textContent = 'dark_mode';
+    } else {
+      document.body.classList.remove('dark-mode');
+      themeIcon.textContent = 'light_mode';
+    }
+  });
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  const newTheme = isDark ? 'dark' : 'light';
+  themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
+  chrome.storage.local.set({ theme: newTheme });
+}
+btnToggleTheme.addEventListener('click', () => {
+  toggleTheme();
 });
 
 // ================== GERENCIAMENTO DE AGENDA ==================
@@ -315,7 +348,7 @@ function carregarEditorAgenda() {
         <div class="form-linha" style="align-items: flex-end;">
           <div class="form-grupo">
             <label>ID do Médico</label>
-            <input type="text" class="medico-id-input" value="${medicoId}" readonly style="background-color: #e2e8f0;">
+            <input type="text" class="medico-id-input" value="${medicoId}" readonly style="background-color: var(--border);">
           </div>
           <div class="form-grupo">
             <label>Nome do Médico</label>
@@ -326,7 +359,7 @@ function carregarEditorAgenda() {
         <div class="secao-titulo" style="margin-top:10px;">Horários</div>
         <div class="horarios-container">${horariosHtml}</div>
         <div class="botoes-container" style="margin-top: 8px; gap: 4px;">
-          <button class="btn-backup limpar-horarios" style="font-size:11px; padding: 4px 8px; flex: 0.5; background-color: #fff1f2; border-color: #ffdde0; color: var(--danger);"><span class="material-icons-round" style="font-size:14px;">delete_sweep</span> Limpar</button>
+          <button class="btn-backup limpar-horarios" style="font-size:11px; padding: 4px 8px; flex: 0.5; background-color: var(--primary-light); border-color: var(--border); color: var(--danger);"><span class="material-icons-round" style="font-size:14px;">delete_sweep</span> Limpar</button>
           <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; flex: 1;">+ Adicionar Horário</button>
         </div>
       `;
@@ -391,7 +424,7 @@ btnAdicionarMedicoAgenda.addEventListener('click', () => {
     <div class="secao-titulo" style="margin-top:10px;">Horários</div>
     <div class="horarios-container"></div>
     <div class="botoes-container" style="margin-top: 8px; gap: 4px;">
-      <button class="btn-backup limpar-horarios" style="font-size:11px; padding: 4px 8px; flex: 0.5; background-color: #fff1f2; border-color: #ffdde0; color: var(--danger);"><span class="material-icons-round" style="font-size:14px;">delete_sweep</span> Limpar</button>
+      <button class="btn-backup limpar-horarios" style="font-size:11px; padding: 4px 8px; flex: 0.5; background-color: var(--primary-light); border-color: var(--border); color: var(--danger);"><span class="material-icons-round" style="font-size:14px;">delete_sweep</span> Limpar</button>
       <button class="btn-backup adicionar-horario" style="font-size:11px; padding: 4px 8px; flex: 1;">+ Adicionar Horário</button>
     </div>
   `;
@@ -809,36 +842,73 @@ btnCancelar.addEventListener('click', resetarFormulario);
 function carregarEstatisticas() {
   chrome.storage.local.get({ mensagens: [] }, (resultado) => {
     const mensagens = resultado.mensagens || [];
+    const totalMensagens = mensagens.length;
+    
+    const totalUsos = mensagens.reduce((acc, msg) => acc + (msg.useCount || 0), 0);
+
+    const usadas = mensagens.filter(m => (m.useCount || 0) > 0);
+    const nuncaUsadas = mensagens.filter(m => !m.useCount || m.useCount === 0);
 
     // Ordena por mais usadas (maior useCount primeiro)
-    const maisUsadas = [...mensagens].sort((a, b) => (b.useCount || 0) - (a.useCount || 0));
+    const maisUsadas = [...usadas].sort((a, b) => (b.useCount || 0) - (a.useCount || 0));
     
-    // Ordena por menos usadas (menor useCount primeiro, mas apenas as que já foram usadas)
-    const menosUsadas = [...mensagens].filter(m => (m.useCount || 0) > 0).sort((a, b) => (a.useCount || 0) - (b.useCount || 0));
+    // Ordena por menos usadas (menor useCount primeiro)
+    const menosUsadas = [...usadas].sort((a, b) => (a.useCount || 0) - (b.useCount || 0));
 
-    renderizarListaStats(listaMaisUsadas, maisUsadas.slice(0, 5), 'most-used');
-    renderizarListaStats(listaMenosUsadas, menosUsadas.slice(0, 5), 'least-used');
+    // Atualiza os cards de resumo
+    statsTotalUsos.textContent = totalUsos;
+    statsTotalMensagens.textContent = totalMensagens;
+    statsMensagensNaoUsadas.textContent = nuncaUsadas.length;
+
+    // Renderiza as listas
+    renderizarListaStats(listaMaisUsadas, maisUsadas, 'most-used', totalUsos);
+    renderizarListaStats(listaMenosUsadas, menosUsadas, 'least-used', totalUsos);
+    renderizarListaStats(listaNuncaUsadas, nuncaUsadas.sort((a,b) => a.titulo.localeCompare(b.titulo)), 'never-used', totalUsos);
   });
 }
 
-function renderizarListaStats(ulElement, lista, classe) {
+function renderizarListaStats(ulElement, lista, classe, totalUsos = 1) {
   ulElement.innerHTML = '';
   if (lista.length === 0) {
-    ulElement.innerHTML = `<li style="font-size: 11px; color: var(--text-secondary); text-align: center;">Nenhum dado para exibir.</li>`;
+    ulElement.innerHTML = `<li style="font-size: 11px; color: var(--text-secondary); text-align: center; padding: 10px 0;">Nenhuma mensagem nesta categoria.</li>`;
     return;
   }
 
   lista.forEach(msg => {
     const li = document.createElement('li');
     li.className = `stats-item ${classe}`;
+    
+    const useCount = msg.useCount || 0;
+    const percent = totalUsos > 0 ? ((useCount / totalUsos) * 100).toFixed(1) : 0;
+
     li.innerHTML = `
-      <span class="stats-item-title" title="${msg.titulo}">${msg.titulo}</span>
-      <span class="stats-item-count" title="${msg.useCount || 0} usos">${msg.useCount || 0}</span>
+      <div class="stats-item-info">
+          <span class="stats-item-title" title="${msg.titulo}">${msg.titulo}</span>
+          ${classe !== 'never-used' ? `<span class="stats-item-percent">${percent}% do total</span>` : ''}
+      </div>
+      <span class="stats-item-count" title="${useCount} usos">${useCount}</span>
     `;
     ulElement.appendChild(li);
   });
 }
 
+function zerarEstatisticas() {
+    if (!confirm("Tem certeza que deseja zerar TODAS as estatísticas de uso? Esta ação não pode ser desfeita.")) {
+        return;
+    }
+
+    chrome.storage.local.get({ mensagens: [] }, (resultado) => {
+        const mensagens = resultado.mensagens || [];
+        const mensagensZeradas = mensagens.map(msg => ({ ...msg, useCount: 0 }));
+
+        chrome.storage.local.set({ mensagens: mensagensZeradas }, () => {
+            alert("Estatísticas zeradas com sucesso!");
+            carregarEstatisticas(); // Recarrega a tela de estatísticas
+        });
+    });
+}
+
+btnZerarEstatisticas.addEventListener('click', zerarEstatisticas);
 
 
 function carregarMensagens() {
@@ -908,17 +978,20 @@ function filtrarEExibirMensagens(termo) {
       const corPasta = pastaInfo?.cor || 'var(--primary)';
 
       blocoGrupo.innerHTML = `
-        <div class="pasta-header-titulo" style="display: flex; align-items: center; justify-content: space-between; background: ${nivelHierarquia > 1 ? '#f8fafc' : '#f1f5f9'}; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; user-select: none; margin-bottom: 4px;">
+        <div class="pasta-header-titulo" style="display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; user-select: none; margin-bottom: 4px;">
           <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text);">
             <span class="material-icons-round icone-pasta-estado" style="font-size: 15px; color: var(--primary);">folder</span>
             <span>${nomeNo.toUpperCase()}</span>
           </div>
           <span class="material-icons-round icone-seta-estado" style="font-size: 14px; color: var(--text-secondary); transition: transform 0.2s;">expand_more</span>
         </div>
-        <div class="conteudo-ramificacao-pasta" style="display: none; flex-direction: column; border-left: 1px dashed #cbd5e1; margin-left: 6px; padding-left: 4px;"></div>
+        <div class="conteudo-ramificacao-pasta" style="display: none; flex-direction: column; margin-left: 6px; padding-left: 4px;"></div>
       `;
 
       const headerClicavel = blocoGrupo.querySelector('.pasta-header-titulo');
+      if (nivelHierarquia > 1) {
+        headerClicavel.classList.add('nested-header');
+      }
       areaFilhos = blocoGrupo.querySelector('.conteudo-ramificacao-pasta');
       const iconePasta = blocoGrupo.querySelector('.icone-pasta-estado');
       const iconeSeta = blocoGrupo.querySelector('.icone-seta-estado');

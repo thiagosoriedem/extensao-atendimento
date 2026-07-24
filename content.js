@@ -455,7 +455,7 @@ async function enviarMensagensEmSequencia(mensagens, campo, index = 0) {
 async function enviarAnexos(arquivos) {
   if (!arquivos || arquivos.length === 0) return false;
   if (!navigator.clipboard || !navigator.clipboard.write) {
-    console.error("TextSync PRO: A API de Clipboard (navigator.clipboard.write) não é suportada neste navegador ou contexto.");
+    console.error("Telefonia SOS: A API de Clipboard (navigator.clipboard.write) não é suportada neste navegador ou contexto.");
     alert("Seu navegador não suporta o envio de anexos por esta extensão. Tente atualizar o Chrome.");
     return false;
   }
@@ -465,7 +465,7 @@ async function enviarAnexos(arquivos) {
     await navigator.clipboard.write(clipboardItems);
     return true;
   } catch (error) {
-    console.error("TextSync PRO: Erro ao escrever arquivos na área de transferência:", error);
+    console.error("Telefonia SOS: Erro ao escrever arquivos na área de transferência:", error);
     alert("Ocorreu um erro ao tentar anexar os arquivos. Verifique as permissões do navegador.");
     return false;
   }

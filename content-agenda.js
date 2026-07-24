@@ -1,6 +1,6 @@
 // content-agenda.js
 
-console.log("TextSync PRO - Módulo de Agenda carregado.");
+console.log("Telefonia SOS - Módulo de Agenda carregado.");
 let mapeamentoMedicoUnidade = {};
 
 // Carrega o mapeamento do storage ao iniciar
@@ -251,12 +251,12 @@ async function startMassReschedule(destinationAgendaId, newDate, observation) {
     // uma lista de elementos que se modifica a cada iteração.
     while (processedCount < totalAppointments) {
         if (isRescheduleCancelled) {
-            console.log("TextSync PRO: Remarcação em lote cancelada pelo usuário.");
+            console.log("Telefonia SOS: Remarcação em lote cancelada pelo usuário.");
             break;
         }
         const currentAppointments = document.querySelectorAll(appointmentSelector);
         if (currentAppointments.length === 0) {
-            console.warn("TextSync PRO: Não há mais agendamentos para processar. Encerrando.");
+            console.warn("Telefonia SOS: Não há mais agendamentos para processar. Encerrando.");
             break;
         }
 
@@ -300,7 +300,7 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
                 elementId: tempId
             }, (response) => {
                 if (chrome.runtime.lastError) {
-                    console.error("TextSync PRO: Erro ao comunicar com o background script:", chrome.runtime.lastError.message);
+                    console.error("Telefonia SOS: Erro ao comunicar com o background script:", chrome.runtime.lastError.message);
                 }
                 // A promessa é resolvida quando o background script responde, garantindo
                 // que o popover foi acionado antes de continuar.
@@ -344,12 +344,12 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
         }
 
         if (!rescheduleButton) {
-            console.warn('TextSync PRO: Botão de reagendar não foi encontrado no popover. Pulando.');
+            console.warn('Telefonia SOS: Botão de reagendar não foi encontrado no popover. Pulando.');
             // Tenta fechar qualquer popover aberto para não travar o processo.
             const popover = document.querySelector('.popover.in');
             if (popover) {
                 // Adiciona um log do conteúdo do popover para facilitar a depuração futura.
-                console.log("TextSync PRO: Conteúdo do popover encontrado:", popover.innerHTML);
+                console.log("Telefonia SOS: Conteúdo do popover encontrado:", popover.innerHTML);
                 const closeBtn = popover.querySelector('.c-popover-click-icon--close');
                 if (closeBtn) {
                     closeBtn.click();
@@ -358,7 +358,7 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
                     popover.remove();
                 }
             } else {
-                console.warn('TextSync PRO: O popover (.popover.in) também não foi encontrado, o que indica que ele não abriu.');
+                console.warn('Telefonia SOS: O popover (.popover.in) também não foi encontrado, o que indica que ele não abriu.');
             }
             await new Promise(r => setTimeout(r, 200)); // Wait for popover to close
             resolve();
@@ -369,7 +369,7 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
 
         const modal = await waitForElement('#modalAgenda.in', 4000);
         if (!modal) {
-            console.error('TextSync PRO: Modal de agendamento não abriu. Pulando agendamento.');
+            console.error('Telefonia SOS: Modal de agendamento não abriu. Pulando agendamento.');
             resolve();
             return;
         }
@@ -378,7 +378,7 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
         // Isso é mais confiável do que uma pausa fixa, pois garante que o componente está pronto.
         const select2Container = await waitForElement('#modalAgenda.in span[aria-labelledby="select2-id_medico-container"]', 4000);
         if (!select2Container) {
-            console.error('TextSync PRO: O componente Select2 para médicos não foi encontrado no modal. Pulando.');
+            console.error('Telefonia SOS: O componente Select2 para médicos não foi encontrado no modal. Pulando.');
             // Tenta fechar o modal para não travar o fluxo
             const closeButton = modal.querySelector('button.close[data-dismiss="modal"]');
             if (closeButton) {
@@ -398,7 +398,7 @@ async function processAppointment(element, destinationAgendaId, newDate, observa
         const observationTextarea = modal.querySelector('#id_observacoes');
 
         if (!professionalSelectInModal || !dateInputInModal || !saveButtonInModal) {
-             console.error('TextSync PRO: Elementos essenciais (médico, data, salvar) não encontrados no modal. Pulando.');
+             console.error('Telefonia SOS: Elementos essenciais (médico, data, salvar) não encontrados no modal. Pulando.');
              const closeButton = modal.querySelector('button.close[data-dismiss="modal"]');
              if (closeButton) {
                 closeButton.click();
