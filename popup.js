@@ -998,13 +998,14 @@ inputImportar.addEventListener('change', (evento) => {
         const mapaPastasAtuais = new Map(atuaisPastas.map(p => [p.nome, p]));
 
         const tratadas = mensagensImportar.map((msg, index) => ({
-          id: "msg_" + Date.now() + "_" + index + "_" + Math.floor(Math.random() * 1000),
+          // Mantém o ID do backup se existir, senão gera um novo
+          id: msg.id || "msg_" + Date.now() + "_" + index + "_" + Math.floor(Math.random() * 1000),
           titulo: msg.titulo || "Sem Título",
-          atalho: (msg.atalho || "").replace('--', '').trim().toLowerCase(), // Limpa o atalho
+          atalho: (msg.atalho || "").replace('--', '').trim().toLowerCase(),
           categoria: msg.categoria || "Outros",
           texto: msg.texto || "",
           anexos: msg.anexos || [],
-          useCount: msg.useCount || 0 // Garante que o contador exista
+          useCount: msg.useCount || 0
         }));
 
         tratadas.forEach(msg => {
@@ -1022,15 +1023,28 @@ inputImportar.addEventListener('change', (evento) => {
           }
         });
 
-        const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
+        // Lógica de merge para mensagens, evitando duplicatas por título
+        const mapaMensagensFinais = new Map(atuaisMensagens.map(m => [m.titulo, m]));
+        tratadas.forEach(msgImportada => {
+            const msgExistente = mapaMensagensFinais.get(msgImportada.titulo);
+            if (msgExistente) {
+                // Se a mensagem já existe, atualizamos o conteúdo dela com o do backup,
+                // mas mantemos o useCount que já estava salvo localmente.
+                msgImportada.useCount = msgExistente.useCount;
+                msgImportada.id = msgExistente.id; // Mantém o ID original para estabilidade
+            }
+            mapaMensagensFinais.set(msgImportada.titulo, msgImportada);
+        });
+        const mensagensFinais = Array.from(mapaMensagensFinais.values());
 
         // Lógica de merge para credenciais, evitando duplicatas por nome
         const atuaisCredenciais = resultado.credenciais || [];
         const mapaCredenciaisAtuais = new Map(atuaisCredenciais.map(c => [c.nome, c]));
         const novasCredenciais = credenciaisImportar.filter(c => !mapaCredenciaisAtuais.has(c.nome));
         const credenciaisFinais = [...atuaisCredenciais, ...novasCredenciais];
+        const pastasFinais = Array.from(mapaPastasAtuais.values()).sort((a, b) => a.nome.localeCompare(b.nome));
 
-        chrome.storage.local.set({ mensagens: [...atuaisMensagens, ...tratadas], pastas: pastasFinais, credenciais: credenciaisFinais }, () => {
+        chrome.storage.local.set({ mensagens: mensagensFinais, pastas: pastasFinais, credenciais: credenciaisFinais }, () => {
           chrome.runtime.sendMessage({ acao: "atualizar_menu" }, () => {
             atualizarInterfacePastas();
             carregarMensagens();
